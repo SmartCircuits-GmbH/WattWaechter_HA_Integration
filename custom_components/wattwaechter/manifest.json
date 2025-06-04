@@ -1,0 +1,12 @@
+{
+  "domain": "wattwaechter",
+  "name": "Wattwächter",
+  "version": "1.0.0",
+  "config_flow": true,
+  "documentation": "https://github.com/deinname/wattwaechter",
+  "dependencies": [],
+  "codeowners": ["@deinname"],
+  "iot_class": "local_polling",
+  "integration_type": "device",
+  "zeroconf": ["_wattwaechter._tcp.local."]
+}
