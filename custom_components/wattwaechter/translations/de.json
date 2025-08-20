@@ -1,0 +1,20 @@
+{
+  "title": "Wattwächter",
+  "config": {
+    "step": {
+      "confirm": {
+        "title": "Wattwächter hinzufügen",
+        "description": "Gerät erkannt:\n\nModell: {model}\nFirmware: {fw}\nIP: {host}\nSeriennummer: {serial}"
+      }
+    }
+  },
+  "options": {
+  "step": {
+    "init": {
+      "title": "WattWächter Geräte hinzufügen",
+      "description": "Wähle ein WattWächter-Gerät aus, das du hinzufügen möchtest. ({count} gefunden)"
+    }
+  }
+}
+
+}

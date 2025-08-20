@@ -76,7 +76,8 @@ class WattwaechterSensor(CoordinatorEntity, SensorEntity):
         self._attr_native_unit_of_measurement = info["unit"]
         self._attr_device_class = info["device_class"]
         self._attr_state_class = info["state_class"]
-        self._attr_unique_id = f"wattwaechter_{obis}"
+        device_id = coordinator.device_id  # MAC oder serialno vom ESP32 – eindeutig pro Gerät
+        self._attr_unique_id = f"wattwaechter_{device_id}_{obis}"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, "wattwaechter")},
             "name": "Wattwächter",
