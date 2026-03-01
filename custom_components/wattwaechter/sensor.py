@@ -1,90 +1,154 @@
+"""Sensor platform for the WattWächter Plus integration."""
 
-from homeassistant.components.sensor import SensorEntity
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from . import DOMAIN
+from __future__ import annotations
 
-OBIS_INFO = {
-    # Energiezähler
-    "1.8.0": {"name": "Bezug (1.8.0)", "unit": "kWh", "device_class": "energy", "state_class": "total_increasing"},
-    "2.8.0": {"name": "Einspeisung (2.8.0)", "unit": "kWh", "device_class": "energy", "state_class": "total_increasing"},
-    "1.8.1": {"name": "Bezug Tarif 1", "unit": "kWh", "device_class": "energy", "state_class": "total_increasing"},
-    "1.8.2": {"name": "Bezug Tarif 2", "unit": "kWh", "device_class": "energy", "state_class": "total_increasing"},
-    "2.8.1": {"name": "Einspeisung Tarif 1", "unit": "kWh", "device_class": "energy", "state_class": "total_increasing"},
-    "2.8.2": {"name": "Einspeisung Tarif 2", "unit": "kWh", "device_class": "energy", "state_class": "total_increasing"},
+import logging
 
-    # Momentanleistung
-    "16.7.0": {"name": "Wirkleistung (gesamt)", "unit": "W", "device_class": "power", "state_class": "measurement"},
-    "36.7.0": {"name": "Leistung L1", "unit": "W", "device_class": "power", "state_class": "measurement"},
-    "56.7.0": {"name": "Leistung L2", "unit": "W", "device_class": "power", "state_class": "measurement"},
-    "76.7.0": {"name": "Leistung L3", "unit": "W", "device_class": "power", "state_class": "measurement"},
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-    # Spannung
-    "32.7.0": {"name": "Spannung L1", "unit": "V", "device_class": "voltage", "state_class": "measurement"},
-    "52.7.0": {"name": "Spannung L2", "unit": "V", "device_class": "voltage", "state_class": "measurement"},
-    "72.7.0": {"name": "Spannung L3", "unit": "V", "device_class": "voltage", "state_class": "measurement"},
+from .const import (
+    DIAGNOSTIC_SENSORS,
+    DOMAIN,
+    KNOWN_OBIS_CODES,
+    DiagnosticSensorDescription,
+    ObisSensorDescription,
+)
+from .coordinator import WattwaechterCoordinator
+from .entity import WattwaechterEntity
 
-    # Stromstärke
-    "31.7.0": {"name": "Strom L1", "unit": "A", "device_class": "current", "state_class": "measurement"},
-    "51.7.0": {"name": "Strom L2", "unit": "A", "device_class": "current", "state_class": "measurement"},
-    "71.7.0": {"name": "Strom L3", "unit": "A", "device_class": "current", "state_class": "measurement"},
+_LOGGER = logging.getLogger(__name__)
 
-    # Frequenz (falls unterstützt)
-    "14.7.0": {"name": "Frequenz", "unit": "Hz", "device_class": "frequency", "state_class": "measurement"},
-
-    # Blindleistung (var)
-    "18.7.0": {"name": "Blindleistung", "unit": "var", "device_class": None, "state_class": "measurement"},
-
-    # Scheinleistung (VA)
-    "30.7.0": {"name": "Scheinleistung gesamt", "unit": "VA", "device_class": None, "state_class": "measurement"},
-
-    # Leistungsfaktor (cos φ)
-    "33.7.0": {"name": "Leistungsfaktor L1", "unit": "", "device_class": None, "state_class": "measurement"},
-    "53.7.0": {"name": "Leistungsfaktor L2", "unit": "", "device_class": None, "state_class": "measurement"},
-    "73.7.0": {"name": "Leistungsfaktor L3", "unit": "", "device_class": None, "state_class": "measurement"},
-
-    # Zählernummer (string)
-    "0.0.0": {"name": "Zählernummer", "unit": "", "device_class": None, "state_class": None},
-
-    # Aktuelle Uhrzeit (falls verfügbar)
-    "0.9.1": {"name": "Uhrzeit", "unit": "", "device_class": "timestamp", "state_class": None},
-    "0.9.2": {"name": "Datum", "unit": "", "device_class": "timestamp", "state_class": None},
+# Map API unit strings to HA unit/device_class/state_class for unknown OBIS codes
+UNIT_MAP: dict[str, tuple[str | None, SensorDeviceClass | None, SensorStateClass | None]] = {
+    "kWh": ("kWh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING),
+    "Wh": ("Wh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING),
+    "W": ("W", SensorDeviceClass.POWER, SensorStateClass.MEASUREMENT),
+    "V": ("V", SensorDeviceClass.VOLTAGE, SensorStateClass.MEASUREMENT),
+    "A": ("A", SensorDeviceClass.CURRENT, SensorStateClass.MEASUREMENT),
+    "Hz": ("Hz", SensorDeviceClass.FREQUENCY, SensorStateClass.MEASUREMENT),
+    "var": ("var", None, SensorStateClass.MEASUREMENT),
+    "VA": ("VA", None, SensorStateClass.MEASUREMENT),
 }
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    initial_data = coordinator.data
 
-    entities = []
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up WattWächter sensors from a config entry."""
+    coordinator: WattwaechterCoordinator = hass.data[DOMAIN][entry.entry_id]
+    entities: list[SensorEntity] = []
 
-    for obis_code, value in initial_data.items():
-        info = OBIS_INFO.get(obis_code, {
-            "name": f"OBIS {obis_code}",
-            "unit": "",
-            "device_class": None,
-            "state_class": None
-        })
+    # Dynamic OBIS sensors from meter data
+    if coordinator.data.meter:
+        for obis_code, meter_value in coordinator.data.meter.items():
+            # Skip non-OBIS keys (timestamp, datetime)
+            if not isinstance(meter_value, dict) or "value" not in meter_value:
+                continue
 
-        entities.append(WattwaechterSensor(coordinator, obis_code, info))
+            if obis_code in KNOWN_OBIS_CODES:
+                # Known OBIS code with predefined metadata
+                entities.append(
+                    WattwaechterObisSensor(
+                        coordinator=coordinator,
+                        description=KNOWN_OBIS_CODES[obis_code],
+                        obis_code=obis_code,
+                    )
+                )
+            else:
+                # Unknown OBIS code - create generic sensor from API data
+                api_unit = meter_value.get("unit", "")
+                unit, device_class, state_class = UNIT_MAP.get(
+                    api_unit, (api_unit or None, None, SensorStateClass.MEASUREMENT)
+                )
+                description = ObisSensorDescription(
+                    key=obis_code,
+                    name=f"OBIS {obis_code}",
+                    native_unit_of_measurement=unit,
+                    device_class=device_class,
+                    state_class=state_class,
+                )
+                entities.append(
+                    WattwaechterObisSensor(
+                        coordinator=coordinator,
+                        description=description,
+                        obis_code=obis_code,
+                    )
+                )
+
+    # Diagnostic sensors from system info
+    if coordinator.data.system:
+        for description in DIAGNOSTIC_SENSORS:
+            entities.append(
+                WattwaechterDiagnosticSensor(
+                    coordinator=coordinator,
+                    description=description,
+                )
+            )
 
     async_add_entities(entities)
 
-class WattwaechterSensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator, obis, info):
+
+class WattwaechterObisSensor(WattwaechterEntity, SensorEntity):
+    """Sensor for OBIS meter values."""
+
+    entity_description: ObisSensorDescription
+
+    def __init__(
+        self,
+        coordinator: WattwaechterCoordinator,
+        description: ObisSensorDescription,
+        obis_code: str,
+    ) -> None:
+        """Initialize the OBIS sensor."""
         super().__init__(coordinator)
-        self._obis = obis
-        self._attr_name = info["name"]
-        self._attr_native_unit_of_measurement = info["unit"]
-        self._attr_device_class = info["device_class"]
-        self._attr_state_class = info["state_class"]
-        device_id = coordinator.device_id  # MAC oder serialno vom ESP32 – eindeutig pro Gerät
-        self._attr_unique_id = f"wattwaechter_{device_id}_{obis}"
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, "wattwaechter")},
-            "name": "Wattwächter",
-            "manufacturer": "Wattwächter",
-            "model": "ESP32-C6"
-        }
+        self.entity_description = description
+        self._obis_code = obis_code
+        self._attr_unique_id = f"{coordinator.device_id}_{obis_code}"
 
     @property
-    def native_value(self):
-        return self.coordinator.data.get(self._obis)
+    def native_value(self) -> float | str | None:
+        """Return the current sensor value."""
+        if self.coordinator.data.meter is None:
+            return None
+        meter_value = self.coordinator.data.meter.get(self._obis_code)
+        if meter_value is None or not isinstance(meter_value, dict):
+            return None
+        return meter_value.get("value")
+
+
+class WattwaechterDiagnosticSensor(WattwaechterEntity, SensorEntity):
+    """Sensor for diagnostic system information."""
+
+    entity_description: DiagnosticSensorDescription
+
+    def __init__(
+        self,
+        coordinator: WattwaechterCoordinator,
+        description: DiagnosticSensorDescription,
+    ) -> None:
+        """Initialize the diagnostic sensor."""
+        super().__init__(coordinator)
+        self.entity_description = description
+        self._attr_unique_id = f"{coordinator.device_id}_{description.key}"
+
+    @property
+    def native_value(self) -> str | float | None:
+        """Return the current sensor value."""
+        system = self.coordinator.data.system
+        if not system:
+            return None
+
+        section = system.get(self.entity_description.system_section, [])
+        for item in section:
+            if item.get("name") == self.entity_description.system_key:
+                return item.get("value")
+        return None

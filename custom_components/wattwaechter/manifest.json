@@ -1,12 +1,16 @@
 {
   "domain": "wattwaechter",
-  "name": "Wattwächter",
-  "version": "1.0.0",
+  "name": "WattWächter Plus",
+  "version": "0.1.0",
+  "codeowners": ["@simono41"],
   "config_flow": true,
-  "documentation": "https://github.com/deinname/wattwaechter",
   "dependencies": [],
-  "codeowners": ["@deinname"],
+  "documentation": "https://github.com/simono41/WattWaechter_HA_Integration",
   "iot_class": "local_polling",
-  "integration_type": "hub",
-  "zeroconf": ["_wattwaechter._tcp.local."]
+  "integration_type": "device",
+  "zeroconf": [
+    {
+      "type": "_wattwaechter._tcp.local."
+    }
+  ]
 }

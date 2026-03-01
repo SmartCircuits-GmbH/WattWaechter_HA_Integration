@@ -1,20 +1,71 @@
 {
-  "title": "Wattwächter",
   "config": {
     "step": {
-      "confirm": {
-        "title": "Wattwächter hinzufügen",
-        "description": "Gerät erkannt:\n\nModell: {model}\nFirmware: {fw}\nIP: {host}\nSeriennummer: {serial}"
+      "user": {
+        "title": "WattWächter Plus hinzufügen",
+        "description": "Gib die IP-Adresse oder den Hostnamen deines WattWächter-Geräts ein. Der API-Token ist optional, wenn die Authentifizierung am Gerät deaktiviert ist.",
+        "data": {
+          "host": "Host",
+          "token": "API-Token (optional)"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "WattWächter Plus gefunden",
+        "description": "Ein WattWächter-Gerät wurde in deinem Netzwerk gefunden.\n\nModell: {model}\nFirmware: {firmware}\nHost: {host}\nGeräte-ID: {device_id}\n\nOptional kannst du den API-Token für authentifizierten Zugriff eingeben.",
+        "data": {
+          "token": "API-Token (optional)"
+        }
       }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Gerät nicht möglich. Bitte überprüfe die IP-Adresse und stelle sicher, dass das Gerät eingeschaltet ist.",
+      "invalid_auth": "Ungültiger API-Token. Bitte überprüfe den Token und versuche es erneut.",
+      "unknown": "Ein unerwarteter Fehler ist aufgetreten."
+    },
+    "abort": {
+      "already_configured": "Dieses Gerät ist bereits konfiguriert. Die IP-Adresse wurde aktualisiert.",
+      "already_configured_mqtt": "Dieses Gerät ist bereits über MQTT Auto-Discovery integriert. Bitte deaktiviere MQTT am Gerät oder entferne zuerst die MQTT-Entities, um stattdessen diese Integration zu verwenden.",
+      "no_device_id": "Gerät konnte nicht identifiziert werden."
     }
   },
   "options": {
-  "step": {
-    "init": {
-      "title": "WattWächter Geräte hinzufügen",
-      "description": "Wähle ein WattWächter-Gerät aus, das du hinzufügen möchtest. ({count} gefunden)"
+    "step": {
+      "init": {
+        "title": "WattWächter Plus Optionen",
+        "data": {
+          "scan_interval": "Aktualisierungsintervall (Sekunden)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "import_total": { "name": "Bezug Gesamt" },
+      "export_total": { "name": "Einspeisung Gesamt" },
+      "import_tariff_1": { "name": "Bezug Tarif 1" },
+      "import_tariff_2": { "name": "Bezug Tarif 2" },
+      "export_tariff_1": { "name": "Einspeisung Tarif 1" },
+      "export_tariff_2": { "name": "Einspeisung Tarif 2" },
+      "active_power": { "name": "Wirkleistung" },
+      "active_power_l1": { "name": "Wirkleistung L1" },
+      "active_power_l2": { "name": "Wirkleistung L2" },
+      "active_power_l3": { "name": "Wirkleistung L3" },
+      "voltage_l1": { "name": "Spannung L1" },
+      "voltage_l2": { "name": "Spannung L2" },
+      "voltage_l3": { "name": "Spannung L3" },
+      "current_l1": { "name": "Strom L1" },
+      "current_l2": { "name": "Strom L2" },
+      "current_l3": { "name": "Strom L3" },
+      "frequency": { "name": "Netzfrequenz" },
+      "power_factor": { "name": "Leistungsfaktor" },
+      "power_factor_l1": { "name": "Leistungsfaktor L1" },
+      "power_factor_l2": { "name": "Leistungsfaktor L2" },
+      "power_factor_l3": { "name": "Leistungsfaktor L3" },
+      "wifi_signal": { "name": "WLAN-Signal" },
+      "wifi_ssid": { "name": "WLAN-SSID" },
+      "ip_address": { "name": "IP-Adresse" },
+      "firmware_version": { "name": "Firmware-Version" },
+      "uptime": { "name": "Betriebszeit" }
     }
   }
-}
-
 }
