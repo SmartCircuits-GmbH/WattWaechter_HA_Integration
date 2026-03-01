@@ -3,17 +3,19 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 
-from homeassistant.components.zeroconf import ZeroconfServiceInfo
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL, CONF_TOKEN
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+if TYPE_CHECKING:
+    from homeassistant.components.zeroconf import ZeroconfServiceInfo
 
 from .api import WattwaechterApiClient, WattwaechterAuthError, WattwaechterConnectionError
 from .const import (
@@ -33,13 +35,14 @@ _LOGGER = logging.getLogger(__name__)
 def _has_mqtt_entities(hass: HomeAssistant, device_id: str) -> bool:
     """Check if MQTT discovery entities already exist for this device.
 
-    The ESP publishes MQTT discovery with unique_ids like "WWP-{device_id}_{obis}".
+    The ESP publishes MQTT discovery with unique_ids like
+    "wattwaechter_{device_id}_{obis}" or "WWP-{device_id}_{obis}".
     If such entities exist, the device is already integrated via MQTT.
     """
     registry = er.async_get(hass)
-    mqtt_prefix = f"WWP-{device_id}_"
+    prefixes = (f"wattwaechter_{device_id}_", f"WWP-{device_id}_")
     return any(
-        entity.unique_id.startswith(mqtt_prefix)
+        any(entity.unique_id.startswith(p) for p in prefixes)
         for entity in registry.entities.values()
         if entity.platform == "mqtt"
     )

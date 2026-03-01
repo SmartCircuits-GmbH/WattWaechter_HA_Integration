@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "codeowners": ["@simono41"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["zeroconf"],
   "documentation": "https://github.com/simono41/WattWaechter_HA_Integration",
   "iot_class": "local_polling",
   "integration_type": "device",
