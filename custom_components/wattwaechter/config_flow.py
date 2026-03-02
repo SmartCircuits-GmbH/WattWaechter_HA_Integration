@@ -225,15 +225,68 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_reauth(
+        self, entry_data: dict[str, Any]
+    ) -> FlowResult:
+        """Handle reauth triggered by ConfigEntryAuthFailed."""
+        self._host = entry_data[CONF_HOST]
+        self._device_id = entry_data.get(CONF_DEVICE_ID)
+        self._reauth_entry = self.hass.config_entries.async_get_entry(
+            self.context["entry_id"]
+        )
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle reauth confirmation with new token."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            token = user_input.get(CONF_TOKEN) or None
+
+            session = async_get_clientsession(self.hass)
+            api = WattwaechterApiClient(self._host, session, token)
+            try:
+                await api.async_get_system_info()
+            except WattwaechterAuthError:
+                errors["base"] = "invalid_auth"
+            except WattwaechterConnectionError:
+                errors["base"] = "cannot_connect"
+
+            if not errors:
+                return self.async_update_reload_and_abort(
+                    self._reauth_entry,
+                    data={**self._reauth_entry.data, CONF_TOKEN: token},
+                )
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_TOKEN): str,
+                }
+            ),
+            description_placeholders={
+                "device_id": self._device_id or "",
+                "host": self._host or "",
+            },
+            errors=errors,
+        )
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Get the options flow handler."""
-        return WattwaechterOptionsFlow()
+        return WattwaechterOptionsFlow(config_entry)
 
 
 class WattwaechterOptionsFlow(OptionsFlow):
     """Handle options flow for WattWächter Plus."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize the options flow."""
+        self._config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -242,7 +295,7 @@ class WattwaechterOptionsFlow(OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(data=user_input)
 
-        current_interval = self.config_entry.options.get(
+        current_interval = self._config_entry.options.get(
             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
         )
 

@@ -1,0 +1,78 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Aggiungi WattWächter Plus",
+        "description": "Inserisci l'indirizzo IP o il nome host del tuo dispositivo WattWächter. Il token API è opzionale se l'autenticazione è disabilitata sul dispositivo.",
+        "data": {
+          "host": "Host",
+          "token": "Token API (opzionale)"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "WattWächter Plus trovato",
+        "description": "Un dispositivo WattWächter è stato trovato nella tua rete.\n\nModello: {model}\nFirmware: {firmware}\nHost: {host}\nID dispositivo: {device_id}\n\nFacoltativamente puoi inserire il token API per l'accesso autenticato.",
+        "data": {
+          "token": "Token API (opzionale)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Riautenticare WattWächter Plus",
+        "description": "Il token API per WattWächter {device_id} ({host}) non è valido o è scaduto. Inserisci un nuovo token.",
+        "data": {
+          "token": "Token API"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi al dispositivo. Verifica l'indirizzo IP e assicurati che il dispositivo sia acceso.",
+      "invalid_auth": "Token API non valido. Verifica il token e riprova.",
+      "unknown": "Si è verificato un errore imprevisto."
+    },
+    "abort": {
+      "already_configured": "Questo dispositivo è già configurato. L'indirizzo IP è stato aggiornato.",
+      "already_configured_mqtt": "Questo dispositivo è già integrato tramite MQTT auto-discovery. Disabilita MQTT sul dispositivo o rimuovi prima le entità MQTT per utilizzare questa integrazione.",
+      "no_device_id": "Impossibile identificare il dispositivo."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni WattWächter Plus",
+        "data": {
+          "scan_interval": "Intervallo di aggiornamento (secondi)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "import_total": { "name": "Consumo totale" },
+      "export_total": { "name": "Immissione totale" },
+      "import_tariff_1": { "name": "Consumo tariffa 1" },
+      "import_tariff_2": { "name": "Consumo tariffa 2" },
+      "export_tariff_1": { "name": "Immissione tariffa 1" },
+      "export_tariff_2": { "name": "Immissione tariffa 2" },
+      "active_power": { "name": "Potenza attiva" },
+      "active_power_l1": { "name": "Potenza attiva L1" },
+      "active_power_l2": { "name": "Potenza attiva L2" },
+      "active_power_l3": { "name": "Potenza attiva L3" },
+      "voltage_l1": { "name": "Tensione L1" },
+      "voltage_l2": { "name": "Tensione L2" },
+      "voltage_l3": { "name": "Tensione L3" },
+      "current_l1": { "name": "Corrente L1" },
+      "current_l2": { "name": "Corrente L2" },
+      "current_l3": { "name": "Corrente L3" },
+      "frequency": { "name": "Frequenza di rete" },
+      "power_factor": { "name": "Fattore di potenza" },
+      "power_factor_l1": { "name": "Fattore di potenza L1" },
+      "power_factor_l2": { "name": "Fattore di potenza L2" },
+      "power_factor_l3": { "name": "Fattore di potenza L3" },
+      "wifi_signal": { "name": "Segnale WiFi" },
+      "wifi_ssid": { "name": "SSID WiFi" },
+      "ip_address": { "name": "Indirizzo IP" },
+      "firmware_version": { "name": "Versione firmware" },
+      "uptime": { "name": "Tempo di attività" }
+    }
+  }
+}

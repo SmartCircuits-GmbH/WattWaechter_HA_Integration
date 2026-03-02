@@ -25,16 +25,16 @@ from .entity import WattwaechterEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-# Map API unit strings to HA unit/device_class/state_class for unknown OBIS codes
-UNIT_MAP: dict[str, tuple[str | None, SensorDeviceClass | None, SensorStateClass | None]] = {
-    "kWh": ("kWh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING),
-    "Wh": ("Wh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING),
-    "W": ("W", SensorDeviceClass.POWER, SensorStateClass.MEASUREMENT),
-    "V": ("V", SensorDeviceClass.VOLTAGE, SensorStateClass.MEASUREMENT),
-    "A": ("A", SensorDeviceClass.CURRENT, SensorStateClass.MEASUREMENT),
-    "Hz": ("Hz", SensorDeviceClass.FREQUENCY, SensorStateClass.MEASUREMENT),
-    "var": ("var", None, SensorStateClass.MEASUREMENT),
-    "VA": ("VA", None, SensorStateClass.MEASUREMENT),
+# Map API unit strings to HA unit/device_class/state_class/precision for unknown OBIS codes
+UNIT_MAP: dict[str, tuple[str | None, SensorDeviceClass | None, SensorStateClass | None, int | None]] = {
+    "kWh": ("kWh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING, 2),
+    "Wh": ("Wh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING, 0),
+    "W": ("W", SensorDeviceClass.POWER, SensorStateClass.MEASUREMENT, 0),
+    "V": ("V", SensorDeviceClass.VOLTAGE, SensorStateClass.MEASUREMENT, 1),
+    "A": ("A", SensorDeviceClass.CURRENT, SensorStateClass.MEASUREMENT, 2),
+    "Hz": ("Hz", SensorDeviceClass.FREQUENCY, SensorStateClass.MEASUREMENT, 2),
+    "var": ("var", None, SensorStateClass.MEASUREMENT, 0),
+    "VA": ("VA", None, SensorStateClass.MEASUREMENT, 0),
 }
 
 
@@ -70,16 +70,18 @@ async def async_setup_entry(
                 is_numeric = isinstance(value, (int, float))
 
                 if api_unit and api_unit in UNIT_MAP:
-                    unit, device_class, state_class = UNIT_MAP[api_unit]
+                    unit, device_class, state_class, precision = UNIT_MAP[api_unit]
                 elif is_numeric:
                     unit = api_unit or None
                     device_class = None
                     state_class = SensorStateClass.MEASUREMENT
+                    precision = None
                 else:
                     # String values (e.g. meter number, manufacturer code)
                     unit = None
                     device_class = None
                     state_class = None
+                    precision = None
 
                 description = ObisSensorDescription(
                     key=obis_code,
@@ -87,6 +89,7 @@ async def async_setup_entry(
                     native_unit_of_measurement=unit,
                     device_class=device_class,
                     state_class=state_class,
+                    suggested_display_precision=precision,
                 )
                 entities.append(
                     WattwaechterObisSensor(
