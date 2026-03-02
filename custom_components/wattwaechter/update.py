@@ -38,6 +38,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
 
     _attr_device_class = UpdateDeviceClass.FIRMWARE
     _attr_supported_features = UpdateEntityFeature.INSTALL
+    _attr_should_poll = True
     _attr_unique_id_suffix = "firmware_update"
 
     def __init__(self, coordinator: WattwaechterCoordinator) -> None:

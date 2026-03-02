@@ -45,150 +45,150 @@ class ObisSensorDescription(SensorEntityDescription):
 
 KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
     # Energy meters (kWh) - total_increasing
-    "1-0:1.8.0": ObisSensorDescription(
-        key="1-0:1.8.0",
+    "1.8.0": ObisSensorDescription(
+        key="1.8.0",
         translation_key="import_total",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
-    "1-0:2.8.0": ObisSensorDescription(
-        key="1-0:2.8.0",
+    "2.8.0": ObisSensorDescription(
+        key="2.8.0",
         translation_key="export_total",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
-    "1-0:1.8.1": ObisSensorDescription(
-        key="1-0:1.8.1",
+    "1.8.1": ObisSensorDescription(
+        key="1.8.1",
         translation_key="import_tariff_1",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
-    "1-0:1.8.2": ObisSensorDescription(
-        key="1-0:1.8.2",
+    "1.8.2": ObisSensorDescription(
+        key="1.8.2",
         translation_key="import_tariff_2",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
-    "1-0:2.8.1": ObisSensorDescription(
-        key="1-0:2.8.1",
+    "2.8.1": ObisSensorDescription(
+        key="2.8.1",
         translation_key="export_tariff_1",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
-    "1-0:2.8.2": ObisSensorDescription(
-        key="1-0:2.8.2",
+    "2.8.2": ObisSensorDescription(
+        key="2.8.2",
         translation_key="export_tariff_2",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     # Power (W) - measurement
-    "1-0:16.7.0": ObisSensorDescription(
-        key="1-0:16.7.0",
+    "16.7.0": ObisSensorDescription(
+        key="16.7.0",
         translation_key="active_power",
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:36.7.0": ObisSensorDescription(
-        key="1-0:36.7.0",
+    "36.7.0": ObisSensorDescription(
+        key="36.7.0",
         translation_key="active_power_l1",
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:56.7.0": ObisSensorDescription(
-        key="1-0:56.7.0",
+    "56.7.0": ObisSensorDescription(
+        key="56.7.0",
         translation_key="active_power_l2",
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:76.7.0": ObisSensorDescription(
-        key="1-0:76.7.0",
+    "76.7.0": ObisSensorDescription(
+        key="76.7.0",
         translation_key="active_power_l3",
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     # Voltage (V) - measurement
-    "1-0:32.7.0": ObisSensorDescription(
-        key="1-0:32.7.0",
+    "32.7.0": ObisSensorDescription(
+        key="32.7.0",
         translation_key="voltage_l1",
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:52.7.0": ObisSensorDescription(
-        key="1-0:52.7.0",
+    "52.7.0": ObisSensorDescription(
+        key="52.7.0",
         translation_key="voltage_l2",
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:72.7.0": ObisSensorDescription(
-        key="1-0:72.7.0",
+    "72.7.0": ObisSensorDescription(
+        key="72.7.0",
         translation_key="voltage_l3",
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     # Current (A) - measurement
-    "1-0:31.7.0": ObisSensorDescription(
-        key="1-0:31.7.0",
+    "31.7.0": ObisSensorDescription(
+        key="31.7.0",
         translation_key="current_l1",
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:51.7.0": ObisSensorDescription(
-        key="1-0:51.7.0",
+    "51.7.0": ObisSensorDescription(
+        key="51.7.0",
         translation_key="current_l2",
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:71.7.0": ObisSensorDescription(
-        key="1-0:71.7.0",
+    "71.7.0": ObisSensorDescription(
+        key="71.7.0",
         translation_key="current_l3",
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     # Frequency (Hz) - measurement
-    "1-0:14.7.0": ObisSensorDescription(
-        key="1-0:14.7.0",
+    "14.7.0": ObisSensorDescription(
+        key="14.7.0",
         translation_key="frequency",
         native_unit_of_measurement=UnitOfFrequency.HERTZ,
         device_class=SensorDeviceClass.FREQUENCY,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     # Power factor - measurement
-    "1-0:13.7.0": ObisSensorDescription(
-        key="1-0:13.7.0",
+    "13.7.0": ObisSensorDescription(
+        key="13.7.0",
         translation_key="power_factor",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:33.7.0": ObisSensorDescription(
-        key="1-0:33.7.0",
+    "33.7.0": ObisSensorDescription(
+        key="33.7.0",
         translation_key="power_factor_l1",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:53.7.0": ObisSensorDescription(
-        key="1-0:53.7.0",
+    "53.7.0": ObisSensorDescription(
+        key="53.7.0",
         translation_key="power_factor_l2",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    "1-0:73.7.0": ObisSensorDescription(
-        key="1-0:73.7.0",
+    "73.7.0": ObisSensorDescription(
+        key="73.7.0",
         translation_key="power_factor_l3",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,

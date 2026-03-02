@@ -66,9 +66,21 @@ async def async_setup_entry(
             else:
                 # Unknown OBIS code - create generic sensor from API data
                 api_unit = meter_value.get("unit", "")
-                unit, device_class, state_class = UNIT_MAP.get(
-                    api_unit, (api_unit or None, None, SensorStateClass.MEASUREMENT)
-                )
+                value = meter_value.get("value")
+                is_numeric = isinstance(value, (int, float))
+
+                if api_unit and api_unit in UNIT_MAP:
+                    unit, device_class, state_class = UNIT_MAP[api_unit]
+                elif is_numeric:
+                    unit = api_unit or None
+                    device_class = None
+                    state_class = SensorStateClass.MEASUREMENT
+                else:
+                    # String values (e.g. meter number, manufacturer code)
+                    unit = None
+                    device_class = None
+                    state_class = None
+
                 description = ObisSensorDescription(
                     key=obis_code,
                     name=f"OBIS {obis_code}",
