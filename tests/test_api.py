@@ -151,6 +151,18 @@ async def test_no_auth_header_without_token(mock_session) -> None:
     assert "Authorization" not in call_args.kwargs.get("headers", {})
 
 
+async def test_get_settings(mock_session) -> None:
+    """Test settings endpoint."""
+    settings_data = {"device_name": "Haushalt Simon", "wifi": {}}
+    mock_session.request = AsyncMock(
+        return_value=_mock_response(200, settings_data)
+    )
+    client = WattwaechterApiClient("192.168.1.100", mock_session, "token")
+    result = await client.async_get_settings()
+
+    assert result["device_name"] == "Haushalt Simon"
+
+
 async def test_check_ota(mock_session) -> None:
     """Test OTA check endpoint."""
     ota_data = {"ok": True, "data": {"update_available": True, "version": "2.0.0"}}

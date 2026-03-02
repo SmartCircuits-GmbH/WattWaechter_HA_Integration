@@ -27,6 +27,7 @@ MAX_SCAN_INTERVAL = 900  # 15 minutes
 OTA_CHECK_INTERVAL = 21600  # 6 hours in seconds
 
 CONF_DEVICE_ID = "device_id"
+CONF_DEVICE_NAME = "device_name"
 CONF_MODEL = "model"
 CONF_MAC = "mac"
 CONF_FW_VERSION = "fw_version"

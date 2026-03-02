@@ -45,7 +45,7 @@ async def test_known_obis_sensors(
     await _setup_integration(hass, mock_config_entry, MOCK_METER_DATA)
 
     # Energy sensor (1.8.0 - total consumption)
-    state = hass.states.get("sensor.wattwachter_plus_total_consumption")
+    state = hass.states.get("sensor.haushalt_test_total_consumption")
     assert state is not None
     assert float(state.state) == 12345.678
     assert state.attributes["unit_of_measurement"] == "kWh"
@@ -53,26 +53,26 @@ async def test_known_obis_sensors(
     assert state.attributes["state_class"] == SensorStateClass.TOTAL_INCREASING
 
     # Power sensor (16.7.0 - active power)
-    state = hass.states.get("sensor.wattwachter_plus_active_power")
+    state = hass.states.get("sensor.haushalt_test_active_power")
     assert state is not None
     assert float(state.state) == 1500.5
     assert state.attributes["unit_of_measurement"] == "W"
     assert state.attributes["device_class"] == SensorDeviceClass.POWER
 
     # Voltage sensor (32.7.0)
-    state = hass.states.get("sensor.wattwachter_plus_voltage_l1")
+    state = hass.states.get("sensor.haushalt_test_voltage_l1")
     assert state is not None
     assert float(state.state) == 230.1
     assert state.attributes["device_class"] == SensorDeviceClass.VOLTAGE
 
     # Current sensor (31.7.0)
-    state = hass.states.get("sensor.wattwachter_plus_current_l1")
+    state = hass.states.get("sensor.haushalt_test_current_l1")
     assert state is not None
     assert float(state.state) == 6.52
     assert state.attributes["device_class"] == SensorDeviceClass.CURRENT
 
     # Frequency sensor (14.7.0)
-    state = hass.states.get("sensor.wattwachter_plus_grid_frequency")
+    state = hass.states.get("sensor.haushalt_test_grid_frequency")
     assert state is not None
     assert float(state.state) == 50.01
     assert state.attributes["device_class"] == SensorDeviceClass.FREQUENCY
@@ -85,28 +85,28 @@ async def test_diagnostic_sensors(
     await _setup_integration(hass, mock_config_entry, MOCK_METER_DATA)
 
     # WiFi signal
-    state = hass.states.get("sensor.wattwachter_plus_wifi_signal")
+    state = hass.states.get("sensor.haushalt_test_wifi_signal")
     assert state is not None
     assert float(state.state) == -45
     assert state.attributes["device_class"] == SensorDeviceClass.SIGNAL_STRENGTH
 
     # WiFi SSID
-    state = hass.states.get("sensor.wattwachter_plus_wifi_ssid")
+    state = hass.states.get("sensor.haushalt_test_wifi_ssid")
     assert state is not None
     assert state.state == "MyNetwork"
 
     # IP address
-    state = hass.states.get("sensor.wattwachter_plus_ip_address")
+    state = hass.states.get("sensor.haushalt_test_ip_address")
     assert state is not None
     assert state.state == "192.168.1.100"
 
     # Firmware version
-    state = hass.states.get("sensor.wattwachter_plus_firmware_version")
+    state = hass.states.get("sensor.haushalt_test_firmware_version")
     assert state is not None
     assert state.state == "1.2.3"
 
     # Uptime
-    state = hass.states.get("sensor.wattwachter_plus_uptime")
+    state = hass.states.get("sensor.haushalt_test_uptime")
     assert state is not None
     assert state.state == "2d 5h 30m"
 
@@ -118,13 +118,13 @@ async def test_minimal_meter_data(
     await _setup_integration(hass, mock_config_entry, MOCK_METER_DATA_MINIMAL)
 
     # Sensors for reported OBIS codes should exist
-    assert hass.states.get("sensor.wattwachter_plus_total_consumption") is not None
-    assert hass.states.get("sensor.wattwachter_plus_active_power") is not None
+    assert hass.states.get("sensor.haushalt_test_total_consumption") is not None
+    assert hass.states.get("sensor.haushalt_test_active_power") is not None
 
     # Sensors for unreported OBIS codes should NOT exist
-    assert hass.states.get("sensor.wattwachter_plus_total_feed_in") is None
-    assert hass.states.get("sensor.wattwachter_plus_voltage_l1") is None
-    assert hass.states.get("sensor.wattwachter_plus_current_l1") is None
+    assert hass.states.get("sensor.haushalt_test_total_feed_in") is None
+    assert hass.states.get("sensor.haushalt_test_voltage_l1") is None
+    assert hass.states.get("sensor.haushalt_test_current_l1") is None
 
 
 async def test_unknown_obis_codes(
@@ -134,17 +134,17 @@ async def test_unknown_obis_codes(
     await _setup_integration(hass, mock_config_entry, MOCK_METER_DATA_WITH_UNKNOWN)
 
     # Known sensor still works
-    assert hass.states.get("sensor.wattwachter_plus_total_consumption") is not None
+    assert hass.states.get("sensor.haushalt_test_total_consumption") is not None
 
     # Unknown numeric OBIS code with known unit (W) gets correct device_class
-    state = hass.states.get("sensor.wattwachter_plus_obis_99_99_0")
+    state = hass.states.get("sensor.haushalt_test_obis_99_99_0")
     assert state is not None
     assert float(state.state) == 42.5
     assert state.attributes["unit_of_measurement"] == "W"
     assert state.attributes["device_class"] == SensorDeviceClass.POWER
 
     # Unknown string OBIS code (meter number)
-    state = hass.states.get("sensor.wattwachter_plus_obis_0_0_0")
+    state = hass.states.get("sensor.haushalt_test_obis_0_0_0")
     assert state is not None
     assert state.state == "1EMH0012345678"
 
@@ -154,7 +154,7 @@ async def test_no_meter_data(hass: HomeAssistant, mock_config_entry) -> None:
     await _setup_integration(hass, mock_config_entry, None)
 
     # No OBIS sensors should be created
-    assert hass.states.get("sensor.wattwachter_plus_total_consumption") is None
+    assert hass.states.get("sensor.haushalt_test_total_consumption") is None
 
     # Diagnostic sensors should still exist
-    assert hass.states.get("sensor.wattwachter_plus_wifi_signal") is not None
+    assert hass.states.get("sensor.haushalt_test_wifi_signal") is not None

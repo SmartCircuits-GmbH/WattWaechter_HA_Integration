@@ -12,6 +12,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.wattwaechter.const import (
     CONF_DEVICE_ID,
+    CONF_DEVICE_NAME,
     CONF_FW_VERSION,
     CONF_MAC,
     CONF_MODEL,
@@ -21,6 +22,7 @@ from custom_components.wattwaechter.const import (
 MOCK_HOST = "192.168.1.100"
 MOCK_TOKEN = "test-token-123"
 MOCK_DEVICE_ID = "ABC123"
+MOCK_DEVICE_NAME = "Haushalt Test"
 MOCK_MAC = "AA:BB:CC:DD:EE:FF"
 MOCK_MODEL = "WW-Plus"
 MOCK_FW_VERSION = "1.2.3"
@@ -29,9 +31,16 @@ MOCK_CONFIG_DATA = {
     CONF_HOST: MOCK_HOST,
     CONF_TOKEN: MOCK_TOKEN,
     CONF_DEVICE_ID: MOCK_DEVICE_ID,
+    CONF_DEVICE_NAME: MOCK_DEVICE_NAME,
     CONF_MODEL: MOCK_MODEL,
     CONF_FW_VERSION: MOCK_FW_VERSION,
     CONF_MAC: MOCK_MAC,
+}
+
+MOCK_SETTINGS = {
+    "device_name": MOCK_DEVICE_NAME,
+    "wifi": {},
+    "mqtt": {},
 }
 
 MOCK_ALIVE_RESPONSE = {
@@ -124,6 +133,7 @@ def mock_api():
         client.host = MOCK_HOST
         client.async_alive = AsyncMock(return_value=MOCK_ALIVE_RESPONSE)
         client.async_get_system_info = AsyncMock(return_value=MOCK_SYSTEM_INFO)
+        client.async_get_settings = AsyncMock(return_value=MOCK_SETTINGS)
         client.async_get_meter_data = AsyncMock(return_value=MOCK_METER_DATA)
         client.async_check_ota = AsyncMock(return_value=MOCK_OTA_CHECK_NO_UPDATE)
         client.async_start_ota = AsyncMock(return_value={"ok": True})
@@ -135,7 +145,7 @@ def mock_config_entry(hass: HomeAssistant):
     """Create a mock config entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
-        title=f"WattWächter {MOCK_DEVICE_ID}",
+        title=MOCK_DEVICE_NAME,
         data=MOCK_CONFIG_DATA,
         source="user",
         unique_id=MOCK_DEVICE_ID,

@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 from .api import WattwaechterApiClient, WattwaechterAuthError, WattwaechterConnectionError
 from .const import (
     CONF_DEVICE_ID,
+    CONF_DEVICE_NAME,
     CONF_FW_VERSION,
     CONF_MAC,
     CONF_MODEL,
@@ -122,12 +123,17 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
                     errors["base"] = "cannot_connect"
 
             if not errors:
+                # Try to fetch device name from settings
+                device_name = await self._async_fetch_device_name(token)
+                title = device_name or f"WattWächter {self._device_id}"
+
                 return self.async_create_entry(
-                    title=f"WattWächter {self._device_id}",
+                    title=title,
                     data={
                         CONF_HOST: self._host,
                         CONF_TOKEN: token,
                         CONF_DEVICE_ID: self._device_id,
+                        CONF_DEVICE_NAME: device_name,
                         CONF_MODEL: self._model,
                         CONF_FW_VERSION: self._fw_version,
                         CONF_MAC: self._mac,
@@ -202,12 +208,23 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
                     await self.async_set_unique_id(device_id)
                     self._abort_if_unique_id_configured()
 
+                    # Try to fetch device name from settings
+                    device_name = ""
+                    try:
+                        settings = await api.async_get_settings()
+                        device_name = settings.get("device_name", "")
+                    except (WattwaechterConnectionError, WattwaechterAuthError):
+                        pass
+
+                    title = device_name or f"WattWächter {device_id}"
+
                     return self.async_create_entry(
-                        title=f"WattWächter {device_id}",
+                        title=title,
                         data={
                             CONF_HOST: host,
                             CONF_TOKEN: token,
                             CONF_DEVICE_ID: device_id,
+                            CONF_DEVICE_NAME: device_name,
                             CONF_MODEL: model,
                             CONF_FW_VERSION: fw_version,
                             CONF_MAC: mac,
@@ -224,6 +241,16 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
         )
+
+    async def _async_fetch_device_name(self, token: str | None = None) -> str:
+        """Try to fetch device_name from settings, return empty string on failure."""
+        try:
+            session = async_get_clientsession(self.hass)
+            api = WattwaechterApiClient(self._host, session, token)
+            settings = await api.async_get_settings()
+            return settings.get("device_name", "")
+        except (WattwaechterConnectionError, WattwaechterAuthError):
+            return ""
 
     async def async_step_reauth(
         self, entry_data: dict[str, Any]

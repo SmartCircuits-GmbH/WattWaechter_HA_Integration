@@ -16,10 +16,12 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .api import WattwaechterApiClient, WattwaechterAuthError, WattwaechterConnectionError
 from .const import (
     CONF_DEVICE_ID,
+    CONF_DEVICE_NAME,
     CONF_FW_VERSION,
     CONF_MAC,
     CONF_MODEL,
     DEFAULT_SCAN_INTERVAL,
+    DEVICE_NAME,
     DOMAIN,
 )
 
@@ -52,6 +54,7 @@ class WattwaechterCoordinator(DataUpdateCoordinator[WattwaechterData]):
         self.model: str = config_entry.data.get(CONF_MODEL, "WW-Plus")
         self.mac: str = config_entry.data.get(CONF_MAC, "")
         self.fw_version: str = config_entry.data.get(CONF_FW_VERSION, "")
+        self.device_name: str = config_entry.data.get(CONF_DEVICE_NAME, "") or DEVICE_NAME
 
         scan_interval = config_entry.options.get(
             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL

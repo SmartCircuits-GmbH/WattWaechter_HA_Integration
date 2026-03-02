@@ -15,13 +15,15 @@ from custom_components.wattwaechter.api import (
     WattwaechterAuthError,
     WattwaechterConnectionError,
 )
-from custom_components.wattwaechter.const import CONF_DEVICE_ID, DOMAIN
+from custom_components.wattwaechter.const import CONF_DEVICE_ID, CONF_DEVICE_NAME, DOMAIN
 
 from .conftest import (
     MOCK_ALIVE_RESPONSE,
     MOCK_CONFIG_DATA,
     MOCK_DEVICE_ID,
+    MOCK_DEVICE_NAME,
     MOCK_HOST,
+    MOCK_SETTINGS,
     MOCK_SYSTEM_INFO,
     MOCK_TOKEN,
 )
@@ -54,6 +56,7 @@ async def test_user_flow_success(hass: HomeAssistant) -> None:
         client = mock_cls.return_value
         client.async_alive = AsyncMock(return_value=MOCK_ALIVE_RESPONSE)
         client.async_get_system_info = AsyncMock(return_value=MOCK_SYSTEM_INFO)
+        client.async_get_settings = AsyncMock(return_value=MOCK_SETTINGS)
 
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -61,10 +64,11 @@ async def test_user_flow_success(hass: HomeAssistant) -> None:
         )
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == f"WattWächter {MOCK_DEVICE_ID}"
+    assert result["title"] == MOCK_DEVICE_NAME
     assert result["data"][CONF_HOST] == MOCK_HOST
     assert result["data"][CONF_TOKEN] == MOCK_TOKEN
     assert result["data"][CONF_DEVICE_ID] == MOCK_DEVICE_ID
+    assert result["data"][CONF_DEVICE_NAME] == MOCK_DEVICE_NAME
 
 
 async def test_user_flow_no_token(hass: HomeAssistant) -> None:
@@ -79,6 +83,7 @@ async def test_user_flow_no_token(hass: HomeAssistant) -> None:
         client = mock_cls.return_value
         client.async_alive = AsyncMock(return_value=MOCK_ALIVE_RESPONSE)
         client.async_get_system_info = AsyncMock(return_value=MOCK_SYSTEM_INFO)
+        client.async_get_settings = AsyncMock(return_value=MOCK_SETTINGS)
 
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],

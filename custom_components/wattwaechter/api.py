@@ -122,6 +122,16 @@ class WattwaechterApiClient:
         assert result is not None
         return result
 
+    async def async_get_settings(self) -> dict[str, Any]:
+        """Get device settings.
+
+        GET /api/v1/settings
+        Returns: {"wifi": {...}, "mqtt": {...}, "device_name": str, ...}
+        """
+        result = await self._request("GET", "/settings")
+        assert result is not None
+        return result
+
     async def async_start_ota(self) -> dict[str, Any]:
         """Start firmware update (requires WRITE token).
 
