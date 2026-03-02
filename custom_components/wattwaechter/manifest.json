@@ -6,6 +6,7 @@
   "config_flow": true,
   "dependencies": ["zeroconf"],
   "documentation": "https://docs.xn--wattwchter-u5a.de",
+  "issue_tracker": "https://github.com/SmartCircuits-GmbH/WattWaechter_HA_Integration/issues",
   "iot_class": "local_polling",
   "integration_type": "device",
   "zeroconf": [
