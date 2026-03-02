@@ -7,7 +7,7 @@ Custom Home Assistant integration for [WattWächter](https://wattwächter.de) sm
 
 ## Features
 
-- **Auto-discovery** via Zeroconf (mDNS) — device is found automatically on your network
+- **Auto-discovery** — device is found automatically on your network
 - **Smart meter sensors** — energy (kWh), power (W), voltage (V), current (A), frequency (Hz), power factor
 - **Per-phase monitoring** — individual readings for L1, L2, L3
 - **Diagnostic sensors** — WiFi signal, IP address, firmware version, uptime
