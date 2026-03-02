@@ -5,7 +5,7 @@
   "codeowners": ["@simono41"],
   "config_flow": true,
   "dependencies": ["zeroconf"],
-  "documentation": "https://github.com/simono41/WattWaechter_HA_Integration",
+  "documentation": "https://docs.xn--wattwchter-u5a.de",
   "iot_class": "local_polling",
   "integration_type": "device",
   "zeroconf": [
