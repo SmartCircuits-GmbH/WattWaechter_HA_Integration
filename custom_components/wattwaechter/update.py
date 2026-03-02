@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 import logging
 from typing import Any
@@ -90,6 +91,45 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
         except WattwaechterConnectionError as err:
             _LOGGER.error("Cannot start firmware update: %s", err)
             raise
+
+        self._attr_in_progress = True
+        self.async_write_ha_state()
+
+        try:
+            if await self._wait_for_reboot():
+                _LOGGER.info("WattWächter firmware update completed, refreshing data")
+                await self.coordinator.async_request_refresh()
+            else:
+                _LOGGER.warning(
+                    "WattWächter device did not come back online after firmware update"
+                )
+        finally:
+            self._attr_in_progress = False
+            self.async_write_ha_state()
+
+    async def _wait_for_reboot(self) -> bool:
+        """Wait for device to reboot after OTA and come back online."""
+        # Phase 1: Wait for device to go offline (downloading + flashing + reboot)
+        await asyncio.sleep(5)
+        for _ in range(24):  # up to ~2 minutes
+            try:
+                await self.coordinator.api.async_alive()
+                await asyncio.sleep(5)
+            except WattwaechterConnectionError:
+                _LOGGER.debug("Device offline, firmware update in progress")
+                break
+
+        # Phase 2: Wait for device to come back online
+        for _ in range(36):  # up to ~3 minutes
+            try:
+                await self.coordinator.api.async_alive()
+                _LOGGER.debug("Device back online after firmware update")
+                await asyncio.sleep(2)  # brief stabilization
+                return True
+            except WattwaechterConnectionError:
+                await asyncio.sleep(5)
+
+        return False
 
     async def async_update(self) -> None:
         """Check for firmware updates periodically."""
