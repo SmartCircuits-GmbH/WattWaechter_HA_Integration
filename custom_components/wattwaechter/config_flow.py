@@ -61,6 +61,7 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
         self._model: str | None = None
         self._fw_version: str | None = None
         self._mac: str | None = None
+        self._reauth_entry: ConfigEntry | None = None
 
     async def async_step_zeroconf(
         self, discovery_info: ZeroconfServiceInfo

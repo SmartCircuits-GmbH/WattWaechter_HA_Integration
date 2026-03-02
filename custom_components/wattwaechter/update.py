@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
 import logging
+import time
 from typing import Any
 
 from homeassistant.components.update import (
@@ -16,7 +16,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import WattwaechterApiClient, WattwaechterAuthError, WattwaechterConnectionError
+from .api import WattwaechterAuthError, WattwaechterConnectionError
 from .const import DOMAIN, OTA_CHECK_INTERVAL
 from .coordinator import WattwaechterCoordinator
 from .entity import WattwaechterEntity
@@ -40,7 +40,6 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
     _attr_device_class = UpdateDeviceClass.FIRMWARE
     _attr_supported_features = UpdateEntityFeature.INSTALL | UpdateEntityFeature.PROGRESS
     _attr_should_poll = True
-    _attr_unique_id_suffix = "firmware_update"
 
     def __init__(self, coordinator: WattwaechterCoordinator) -> None:
         """Initialize the update entity."""
@@ -149,8 +148,6 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
 
     async def async_update(self) -> None:
         """Check for firmware updates periodically."""
-        import time
-
         now = time.monotonic()
         if now - self._last_check < OTA_CHECK_INTERVAL:
             return

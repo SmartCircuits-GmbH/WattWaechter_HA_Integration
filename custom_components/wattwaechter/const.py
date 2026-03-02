@@ -46,7 +46,6 @@ class ObisSensorDescription(SensorEntityDescription):
 
 KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
     # Energy meters (kWh) - total_increasing
-    # Energy meters (kWh) - total_increasing
     "1.8.0": ObisSensorDescription(
         key="1.8.0",
         translation_key="import_total",
