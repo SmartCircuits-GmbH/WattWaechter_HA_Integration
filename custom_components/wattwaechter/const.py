@@ -45,12 +45,14 @@ class ObisSensorDescription(SensorEntityDescription):
 
 KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
     # Energy meters (kWh) - total_increasing
+    # Energy meters (kWh) - total_increasing
     "1.8.0": ObisSensorDescription(
         key="1.8.0",
         translation_key="import_total",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
     ),
     "2.8.0": ObisSensorDescription(
         key="2.8.0",
@@ -58,6 +60,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
     ),
     "1.8.1": ObisSensorDescription(
         key="1.8.1",
@@ -65,6 +68,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
     ),
     "1.8.2": ObisSensorDescription(
         key="1.8.2",
@@ -72,6 +76,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
     ),
     "2.8.1": ObisSensorDescription(
         key="2.8.1",
@@ -79,6 +84,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
     ),
     "2.8.2": ObisSensorDescription(
         key="2.8.2",
@@ -86,6 +92,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=2,
     ),
     # Power (W) - measurement
     "16.7.0": ObisSensorDescription(
@@ -94,6 +101,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     "36.7.0": ObisSensorDescription(
         key="36.7.0",
@@ -101,6 +109,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     "56.7.0": ObisSensorDescription(
         key="56.7.0",
@@ -108,6 +117,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     "76.7.0": ObisSensorDescription(
         key="76.7.0",
@@ -115,6 +125,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     # Voltage (V) - measurement
     "32.7.0": ObisSensorDescription(
@@ -123,6 +134,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
     ),
     "52.7.0": ObisSensorDescription(
         key="52.7.0",
@@ -130,6 +142,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
     ),
     "72.7.0": ObisSensorDescription(
         key="72.7.0",
@@ -137,6 +150,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
     ),
     # Current (A) - measurement
     "31.7.0": ObisSensorDescription(
@@ -145,6 +159,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
     ),
     "51.7.0": ObisSensorDescription(
         key="51.7.0",
@@ -152,6 +167,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
     ),
     "71.7.0": ObisSensorDescription(
         key="71.7.0",
@@ -159,6 +175,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
     ),
     # Frequency (Hz) - measurement
     "14.7.0": ObisSensorDescription(
@@ -167,6 +184,7 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         native_unit_of_measurement=UnitOfFrequency.HERTZ,
         device_class=SensorDeviceClass.FREQUENCY,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
     ),
     # Power factor - measurement
     "13.7.0": ObisSensorDescription(
@@ -174,24 +192,28 @@ KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
         translation_key="power_factor",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
     ),
     "33.7.0": ObisSensorDescription(
         key="33.7.0",
         translation_key="power_factor_l1",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
     ),
     "53.7.0": ObisSensorDescription(
         key="53.7.0",
         translation_key="power_factor_l2",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
     ),
     "73.7.0": ObisSensorDescription(
         key="73.7.0",
         translation_key="power_factor_l3",
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=3,
     ),
 }
 

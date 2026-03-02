@@ -15,6 +15,13 @@
         "data": {
           "token": "API-Token (optional)"
         }
+      },
+      "reauth_confirm": {
+        "title": "WattWächter Plus erneut authentifizieren",
+        "description": "Der API-Token für WattWächter {device_id} ({host}) ist ungültig oder abgelaufen. Bitte gib einen neuen Token ein.",
+        "data": {
+          "token": "API-Token"
+        }
       }
     },
     "error": {

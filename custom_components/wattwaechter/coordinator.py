@@ -60,10 +60,10 @@ class WattwaechterCoordinator(DataUpdateCoordinator[WattwaechterData]):
         super().__init__(
             hass,
             _LOGGER,
-            config_entry=config_entry,
             name=f"{DOMAIN}_{self.device_id}",
             update_interval=timedelta(seconds=scan_interval),
         )
+        self.config_entry = config_entry
 
     async def _async_update_data(self) -> WattwaechterData:
         """Fetch data from the WattWächter device."""

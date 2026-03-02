@@ -1,0 +1,78 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "WattWächter Plus toevoegen",
+        "description": "Voer het IP-adres of de hostnaam van je WattWächter-apparaat in. Het API-token is optioneel als authenticatie op het apparaat is uitgeschakeld.",
+        "data": {
+          "host": "Host",
+          "token": "API-token (optioneel)"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "WattWächter Plus gevonden",
+        "description": "Er is een WattWächter-apparaat gevonden op je netwerk.\n\nModel: {model}\nFirmware: {firmware}\nHost: {host}\nApparaat-ID: {device_id}\n\nOptioneel kun je het API-token invoeren voor geauthenticeerde toegang.",
+        "data": {
+          "token": "API-token (optioneel)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "WattWächter Plus opnieuw authenticeren",
+        "description": "Het API-token voor WattWächter {device_id} ({host}) is ongeldig of verlopen. Voer een nieuw token in.",
+        "data": {
+          "token": "API-token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met het apparaat. Controleer het IP-adres en zorg ervoor dat het apparaat is ingeschakeld.",
+      "invalid_auth": "Ongeldig API-token. Controleer je token en probeer het opnieuw.",
+      "unknown": "Er is een onverwachte fout opgetreden."
+    },
+    "abort": {
+      "already_configured": "Dit apparaat is al geconfigureerd. Het IP-adres is bijgewerkt.",
+      "already_configured_mqtt": "Dit apparaat is al geïntegreerd via MQTT auto-discovery. Schakel MQTT uit op het apparaat of verwijder eerst de MQTT-entiteiten om deze integratie te gebruiken.",
+      "no_device_id": "Kan het apparaat niet identificeren."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "WattWächter Plus opties",
+        "data": {
+          "scan_interval": "Updateinterval (seconden)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "import_total": { "name": "Totaal verbruik" },
+      "export_total": { "name": "Totale teruglevering" },
+      "import_tariff_1": { "name": "Verbruik tarief 1" },
+      "import_tariff_2": { "name": "Verbruik tarief 2" },
+      "export_tariff_1": { "name": "Teruglevering tarief 1" },
+      "export_tariff_2": { "name": "Teruglevering tarief 2" },
+      "active_power": { "name": "Actief vermogen" },
+      "active_power_l1": { "name": "Actief vermogen L1" },
+      "active_power_l2": { "name": "Actief vermogen L2" },
+      "active_power_l3": { "name": "Actief vermogen L3" },
+      "voltage_l1": { "name": "Spanning L1" },
+      "voltage_l2": { "name": "Spanning L2" },
+      "voltage_l3": { "name": "Spanning L3" },
+      "current_l1": { "name": "Stroom L1" },
+      "current_l2": { "name": "Stroom L2" },
+      "current_l3": { "name": "Stroom L3" },
+      "frequency": { "name": "Netfrequentie" },
+      "power_factor": { "name": "Vermogensfactor" },
+      "power_factor_l1": { "name": "Vermogensfactor L1" },
+      "power_factor_l2": { "name": "Vermogensfactor L2" },
+      "power_factor_l3": { "name": "Vermogensfactor L3" },
+      "wifi_signal": { "name": "WiFi-signaal" },
+      "wifi_ssid": { "name": "WiFi-SSID" },
+      "ip_address": { "name": "IP-adres" },
+      "firmware_version": { "name": "Firmwareversie" },
+      "uptime": { "name": "Bedrijfstijd" }
+    }
+  }
+}
