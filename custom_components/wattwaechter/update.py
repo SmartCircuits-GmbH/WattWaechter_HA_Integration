@@ -109,27 +109,31 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
 
     async def _wait_for_reboot(self) -> bool:
         """Wait for device to reboot after OTA and come back online."""
-        # Phase 1: Wait for device to go offline (downloading + flashing + reboot)
+        old_version = self.coordinator.fw_version
+        device_went_offline = False
+
         await asyncio.sleep(5)
-        for _ in range(24):  # up to ~2 minutes
+        for _ in range(24):  # poll every 5s, up to ~2 minutes
             try:
-                await self.coordinator.api.async_alive()
-                await asyncio.sleep(5)
+                result = await self.coordinator.api.async_alive()
+                if device_went_offline:
+                    _LOGGER.debug("Device back online after reboot")
+                    return True
+                new_version = result.get("version", "")
+                if new_version and new_version != old_version:
+                    _LOGGER.debug("Firmware version changed: %s -> %s", old_version, new_version)
+                    return True
             except WattwaechterConnectionError:
+                device_went_offline = True
                 _LOGGER.debug("Device offline, firmware update in progress")
-                break
+            await asyncio.sleep(5)
 
-        # Phase 2: Wait for device to come back online
-        for _ in range(36):  # up to ~3 minutes
-            try:
-                await self.coordinator.api.async_alive()
-                _LOGGER.debug("Device back online after firmware update")
-                await asyncio.sleep(2)  # brief stabilization
-                return True
-            except WattwaechterConnectionError:
-                await asyncio.sleep(5)
-
-        return False
+        # Timeout — check if device is at least reachable
+        try:
+            await self.coordinator.api.async_alive()
+            return True
+        except WattwaechterConnectionError:
+            return False
 
     async def async_update(self) -> None:
         """Check for firmware updates periodically."""
