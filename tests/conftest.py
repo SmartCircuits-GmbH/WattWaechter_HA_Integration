@@ -109,6 +109,21 @@ MOCK_OTA_CHECK_UPDATE = {
 }
 
 
+@pytest.fixture(autouse=True, scope="session")
+def _warmup_pycares_thread():
+    """Pre-start pycares background thread to avoid thread-leak false positive.
+
+    pycares starts a global daemon thread (_run_safe_shutdown_loop) the first
+    time a Channel is created.  If the thread starts *during* a test, the
+    pytest-homeassistant-custom-component teardown detects it as a leak.
+    Starting it once at session scope puts it into every test's
+    ``threads_before`` snapshot.
+    """
+    from pycares import _shutdown_manager
+
+    _shutdown_manager.start()
+
+
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations):
     """Enable loading of custom components in all tests."""
