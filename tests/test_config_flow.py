@@ -102,6 +102,12 @@ async def test_user_flow_success(hass: HomeAssistant) -> None:
     assert result["data"][CONF_DEVICE_ID] == MOCK_DEVICE_ID
     assert result["data"][CONF_DEVICE_NAME] == MOCK_DEVICE_NAME
 
+    # Clean up created config entry to avoid teardown thread leak
+    entries = hass.config_entries.async_entries(DOMAIN)
+    for entry in entries:
+        await hass.config_entries.async_remove(entry.entry_id)
+    await hass.async_block_till_done()
+
 
 async def test_user_flow_no_token(hass: HomeAssistant) -> None:
     """Test manual configuration without API token."""
