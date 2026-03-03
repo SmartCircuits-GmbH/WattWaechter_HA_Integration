@@ -57,11 +57,17 @@ MOCK_ZEROCONF_DISCOVERY = type("ZeroconfServiceInfo", (), {
 
 @pytest.fixture(autouse=True)
 def mock_setup_entry():
-    """Mock the integration setup to avoid full platform loading."""
-    with patch(
-        "custom_components.wattwaechter.async_setup_entry",
-        return_value=True,
-    ) as mock:
+    """Mock the integration setup and unload to avoid full platform loading."""
+    with (
+        patch(
+            "custom_components.wattwaechter.async_setup_entry",
+            return_value=True,
+        ) as mock,
+        patch(
+            "custom_components.wattwaechter.async_unload_entry",
+            return_value=True,
+        ),
+    ):
         yield mock
 
 
