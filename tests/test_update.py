@@ -25,6 +25,16 @@ from .conftest import (
 ENTITY_ID = "update.haushalt_test_firmware"
 
 
+def _get_update_entity(hass: HomeAssistant):
+    """Find the WattWächter update entity object."""
+    for platform_entities in hass.data.get("entity_platform", {}).values():
+        for ep in platform_entities:
+            for ent in ep.entities.values():
+                if ent.entity_id == ENTITY_ID:
+                    return ent
+    return None
+
+
 async def _setup_integration(hass: HomeAssistant, mock_config_entry, ota_data=None):
     """Set up the integration with given OTA data."""
     with patch(
@@ -44,13 +54,11 @@ async def _setup_integration(hass: HomeAssistant, mock_config_entry, ota_data=No
         await hass.async_block_till_done()
 
         # Trigger entity poll so OTA data is populated
-        await hass.services.async_call(
-            "homeassistant",
-            "update_entity",
-            {"entity_id": ENTITY_ID},
-            blocking=True,
-        )
-        await hass.async_block_till_done()
+        update_entity = _get_update_entity(hass)
+        if update_entity:
+            await update_entity.async_update()
+            update_entity.async_write_ha_state()
+            await hass.async_block_till_done()
 
         return client
 
