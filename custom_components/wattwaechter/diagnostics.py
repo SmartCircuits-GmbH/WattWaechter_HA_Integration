@@ -4,21 +4,19 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_TOKEN
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN
-from .coordinator import WattwaechterCoordinator
+from . import WattwaechterConfigEntry
 
 REDACT_KEYS = {CONF_TOKEN}
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: ConfigEntry
+    hass: HomeAssistant, entry: WattwaechterConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
-    coordinator: WattwaechterCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
 
     # Redact sensitive data from config
     config_data = dict(entry.data)

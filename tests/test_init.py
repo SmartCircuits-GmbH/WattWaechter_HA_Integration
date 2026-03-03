@@ -4,13 +4,11 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
 
-import pytest
-
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 
 from custom_components.wattwaechter.api import WattwaechterConnectionError
-from custom_components.wattwaechter.const import DOMAIN
+from custom_components.wattwaechter.coordinator import WattwaechterCoordinator
 
 from .conftest import MOCK_ALIVE_RESPONSE, MOCK_METER_DATA, MOCK_SYSTEM_INFO
 
@@ -33,8 +31,7 @@ async def test_setup_entry(hass: HomeAssistant, mock_config_entry) -> None:
         await hass.async_block_till_done()
 
     assert mock_config_entry.state is ConfigEntryState.LOADED
-    assert DOMAIN in hass.data
-    assert mock_config_entry.entry_id in hass.data[DOMAIN]
+    assert isinstance(mock_config_entry.runtime_data, WattwaechterCoordinator)
 
 
 async def test_setup_entry_connection_error(
@@ -78,4 +75,3 @@ async def test_unload_entry(hass: HomeAssistant, mock_config_entry) -> None:
         await hass.async_block_till_done()
 
     assert mock_config_entry.state is ConfigEntryState.NOT_LOADED
-    assert mock_config_entry.entry_id not in hass.data.get(DOMAIN, {})

@@ -12,12 +12,12 @@ from homeassistant.components.update import (
     UpdateEntity,
     UpdateEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from . import WattwaechterConfigEntry
 from .api import WattwaechterAuthError, WattwaechterConnectionError
-from .const import DOMAIN, OTA_CHECK_INTERVAL
+from .const import OTA_CHECK_INTERVAL
 from .coordinator import WattwaechterCoordinator
 from .entity import WattwaechterEntity
 
@@ -26,11 +26,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: WattwaechterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up WattWächter firmware update entity."""
-    coordinator: WattwaechterCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     async_add_entities([WattwaechterUpdateEntity(coordinator)])
 
 
@@ -40,6 +40,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
     _attr_device_class = UpdateDeviceClass.FIRMWARE
     _attr_supported_features = UpdateEntityFeature.INSTALL | UpdateEntityFeature.PROGRESS
     _attr_should_poll = True
+    _attr_translation_key = "firmware"
 
     def __init__(self, coordinator: WattwaechterCoordinator) -> None:
         """Initialize the update entity."""
@@ -47,11 +48,6 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
         self._attr_unique_id = f"{coordinator.device_id}_firmware_update"
         self._ota_data: dict[str, Any] | None = None
         self._last_check: float = 0
-
-    @property
-    def name(self) -> str:
-        """Return entity name."""
-        return "Firmware"
 
     @property
     def installed_version(self) -> str | None:

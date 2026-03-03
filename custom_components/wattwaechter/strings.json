@@ -73,6 +73,9 @@
       "ip_address": { "name": "IP address" },
       "firmware_version": { "name": "Firmware version" },
       "uptime": { "name": "Uptime" }
+    },
+    "update": {
+      "firmware": { "name": "Firmware" }
     }
   }
 }

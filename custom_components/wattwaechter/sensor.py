@@ -9,17 +9,16 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     DIAGNOSTIC_SENSORS,
-    DOMAIN,
     KNOWN_OBIS_CODES,
     DiagnosticSensorDescription,
     ObisSensorDescription,
 )
+from . import WattwaechterConfigEntry
 from .coordinator import WattwaechterCoordinator
 from .entity import WattwaechterEntity
 
@@ -40,11 +39,11 @@ UNIT_MAP: dict[str, tuple[str | None, SensorDeviceClass | None, SensorStateClass
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: WattwaechterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up WattWächter sensors from a config entry."""
-    coordinator: WattwaechterCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities: list[SensorEntity] = []
 
     # Dynamic OBIS sensors from meter data

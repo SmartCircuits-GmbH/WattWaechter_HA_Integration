@@ -73,6 +73,9 @@
       "ip_address": { "name": "Dirección IP" },
       "firmware_version": { "name": "Versión de firmware" },
       "uptime": { "name": "Tiempo de actividad" }
+    },
+    "update": {
+      "firmware": { "name": "Firmware" }
     }
   }
 }
