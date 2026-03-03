@@ -22,6 +22,8 @@ from .conftest import (
     MOCK_SYSTEM_INFO,
 )
 
+ENTITY_ID = "update.haushalt_test_firmware"
+
 
 async def _setup_integration(hass: HomeAssistant, mock_config_entry, ota_data=None):
     """Set up the integration with given OTA data."""
@@ -41,6 +43,15 @@ async def _setup_integration(hass: HomeAssistant, mock_config_entry, ota_data=No
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
 
+        # Trigger entity poll so OTA data is populated
+        await hass.services.async_call(
+            "homeassistant",
+            "update_entity",
+            {"entity_id": ENTITY_ID},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
         return client
 
 
@@ -50,7 +61,7 @@ async def test_update_entity_no_update(
     """Test update entity when no firmware update is available."""
     await _setup_integration(hass, mock_config_entry)
 
-    state = hass.states.get("update.haushalt_test_firmware")
+    state = hass.states.get(ENTITY_ID)
     assert state is not None
     assert state.attributes["installed_version"] == MOCK_FW_VERSION
     # No update available: latest_version == installed_version
@@ -61,26 +72,12 @@ async def test_update_entity_update_available(
     hass: HomeAssistant, mock_config_entry
 ) -> None:
     """Test update entity when a firmware update is available."""
-    client = await _setup_integration(
-        hass, mock_config_entry, MOCK_OTA_CHECK_UPDATE
-    )
+    await _setup_integration(hass, mock_config_entry, MOCK_OTA_CHECK_UPDATE)
 
-    # Find the update entity to trigger OTA poll
-    update_entity = None
-    for platform_entities in hass.data.get("entity_platform", {}).values():
-        for ep in platform_entities:
-            for ent in ep.entities.values():
-                if ent.entity_id == "update.haushalt_test_firmware":
-                    update_entity = ent
-                    break
-
-    if update_entity:
-        await update_entity.async_update()
-        await hass.async_block_till_done()
-
-    state = hass.states.get("update.haushalt_test_firmware")
+    state = hass.states.get(ENTITY_ID)
     assert state is not None
     assert state.attributes["installed_version"] == MOCK_FW_VERSION
+    assert state.attributes["latest_version"] == "2.0.0"
 
 
 async def test_update_entity_install(
@@ -100,7 +97,7 @@ async def test_update_entity_install(
         await hass.services.async_call(
             "update",
             "install",
-            {"entity_id": "update.haushalt_test_firmware"},
+            {"entity_id": ENTITY_ID},
             blocking=True,
         )
 
@@ -123,7 +120,7 @@ async def test_update_entity_install_auth_error(
         await hass.services.async_call(
             "update",
             "install",
-            {"entity_id": "update.haushalt_test_firmware"},
+            {"entity_id": ENTITY_ID},
             blocking=True,
         )
 
@@ -144,7 +141,7 @@ async def test_update_entity_install_connection_error(
         await hass.services.async_call(
             "update",
             "install",
-            {"entity_id": "update.haushalt_test_firmware"},
+            {"entity_id": ENTITY_ID},
             blocking=True,
         )
 
@@ -173,7 +170,7 @@ async def test_update_entity_reboot_detection(
         await hass.services.async_call(
             "update",
             "install",
-            {"entity_id": "update.haushalt_test_firmware"},
+            {"entity_id": ENTITY_ID},
             blocking=True,
         )
 
