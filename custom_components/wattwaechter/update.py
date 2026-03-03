@@ -145,7 +145,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
     async def async_update(self) -> None:
         """Check for firmware updates periodically."""
         now = time.monotonic()
-        if now - self._last_check < OTA_CHECK_INTERVAL:
+        if self._last_check > 0 and now - self._last_check < OTA_CHECK_INTERVAL:
             return
 
         self._last_check = now

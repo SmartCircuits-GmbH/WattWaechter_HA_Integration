@@ -12,7 +12,6 @@ from custom_components.wattwaechter.api import (
     WattwaechterAuthError,
     WattwaechterConnectionError,
 )
-from custom_components.wattwaechter.const import DOMAIN
 
 from .conftest import (
     MOCK_ALIVE_RESPONSE,
@@ -66,8 +65,7 @@ async def test_update_entity_update_available(
         hass, mock_config_entry, MOCK_OTA_CHECK_UPDATE
     )
 
-    # Trigger the entity poll to check OTA
-    entity = hass.data[DOMAIN][mock_config_entry.entry_id]
+    # Find the update entity to trigger OTA poll
     update_entity = None
     for platform_entities in hass.data.get("entity_platform", {}).values():
         for ep in platform_entities:
