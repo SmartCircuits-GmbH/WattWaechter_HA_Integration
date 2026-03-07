@@ -49,6 +49,11 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
         self._ota_data: dict[str, Any] | None = None
         self._last_check: float = 0
 
+    async def async_added_to_hass(self) -> None:
+        """Fetch OTA data when entity is added."""
+        await super().async_added_to_hass()
+        await self.async_update()
+
     @property
     def installed_version(self) -> str | None:
         """Return the installed firmware version."""
