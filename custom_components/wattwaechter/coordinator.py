@@ -55,6 +55,7 @@ class WattwaechterCoordinator(DataUpdateCoordinator[WattwaechterData]):
         self.mac: str = config_entry.data.get(CONF_MAC, "")
         self.fw_version: str = config_entry.data.get(CONF_FW_VERSION, "")
         self.device_name: str = config_entry.data.get(CONF_DEVICE_NAME, "") or DEVICE_NAME
+        self.mdns_name: str = ""
 
         scan_interval = config_entry.options.get(
             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
@@ -78,11 +79,15 @@ class WattwaechterCoordinator(DataUpdateCoordinator[WattwaechterData]):
         except WattwaechterConnectionError as err:
             raise UpdateFailed(str(err)) from err
 
-        # Update firmware version from live data
+        # Update firmware version and mDNS name from live data
         if system_info:
             for item in system_info.get("esp", []):
                 if item.get("name") == "os_version":
                     self.fw_version = item.get("value", self.fw_version)
+                    break
+            for item in system_info.get("wifi", []):
+                if item.get("name") == "mdns_name":
+                    self.mdns_name = item.get("value", "")
                     break
 
         return WattwaechterData(meter=meter_data, system=system_info)

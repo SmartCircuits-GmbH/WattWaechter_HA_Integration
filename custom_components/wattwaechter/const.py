@@ -268,4 +268,11 @@ DIAGNOSTIC_SENSORS: tuple[DiagnosticSensorDescription, ...] = (
         system_key="uptime",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
+    DiagnosticSensorDescription(
+        key="mdns_name",
+        translation_key="mdns_name",
+        system_section="wifi",
+        system_key="mdns_name",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
 )

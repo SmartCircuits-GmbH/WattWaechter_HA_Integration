@@ -55,6 +55,7 @@ MOCK_SYSTEM_INFO = {
         {"name": "signal_strength", "value": -45},
         {"name": "ip_address", "value": MOCK_HOST},
         {"name": "mac_address", "value": MOCK_MAC},
+        {"name": "mdns_name", "value": "wattwaechter-aabbccddeeff.local"},
     ],
     "esp": [
         {"name": "esp_id", "value": MOCK_DEVICE_ID},

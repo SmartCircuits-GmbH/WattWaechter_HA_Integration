@@ -110,6 +110,11 @@ async def test_diagnostic_sensors(
     assert state is not None
     assert state.state == "2d 5h 30m"
 
+    # mDNS
+    state = hass.states.get("sensor.haushalt_test_mdns")
+    assert state is not None
+    assert state.state == "wattwaechter-aabbccddeeff.local"
+
 
 async def test_minimal_meter_data(
     hass: HomeAssistant, mock_config_entry
