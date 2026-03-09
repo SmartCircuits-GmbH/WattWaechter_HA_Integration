@@ -7,6 +7,12 @@ from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 
+from aio_wattwaechter import (
+    Wattwaechter,
+    WattwaechterAuthenticationError,
+    WattwaechterConnectionError,
+)
+
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL, CONF_TOKEN
 from homeassistant.core import HomeAssistant, callback
@@ -17,7 +23,6 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 if TYPE_CHECKING:
     from homeassistant.components.zeroconf import ZeroconfServiceInfo
 
-from .api import WattwaechterApiClient, WattwaechterAuthError, WattwaechterConnectionError
 from .const import (
     CONF_DEVICE_ID,
     CONF_DEVICE_NAME,
@@ -90,9 +95,9 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
 
         # Verify device is reachable
         session = async_get_clientsession(self.hass)
-        api = WattwaechterApiClient(self._host, session)
+        client = Wattwaechter(self._host, session=session)
         try:
-            await api.async_alive()
+            await client.alive()
         except WattwaechterConnectionError:
             return self.async_abort(reason="cannot_connect")
 
@@ -115,10 +120,10 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
             # Validate token if provided
             if token:
                 session = async_get_clientsession(self.hass)
-                api = WattwaechterApiClient(self._host, session, token)
+                client = Wattwaechter(self._host, token=token, session=session)
                 try:
-                    await api.async_get_system_info()
-                except WattwaechterAuthError:
+                    await client.system_info()
+                except WattwaechterAuthenticationError:
                     errors["base"] = "invalid_auth"
                 except WattwaechterConnectionError:
                     errors["base"] = "cannot_connect"
@@ -168,31 +173,26 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
             token = user_input.get(CONF_TOKEN) or None
 
             session = async_get_clientsession(self.hass)
-            api = WattwaechterApiClient(host, session, token)
+            client = Wattwaechter(host, token=token, session=session)
 
             # Step 1: Check connectivity
             try:
-                alive = await api.async_alive()
+                alive = await client.alive()
             except WattwaechterConnectionError:
                 errors["base"] = "cannot_connect"
             else:
-                fw_version = alive.get("version", "")
+                fw_version = alive.version
 
                 # Step 2: Get device info (needs auth if enabled)
                 device_id = None
                 mac = ""
                 model = "WW-Plus"
                 try:
-                    system_info = await api.async_get_system_info()
-                    for item in system_info.get("esp", []):
-                        if item.get("name") == "esp_id":
-                            device_id = item.get("value")
-                        if item.get("name") == "os_version":
-                            fw_version = item.get("value", fw_version)
-                    for item in system_info.get("wifi", []):
-                        if item.get("name") == "mac_address":
-                            mac = item.get("value", "")
-                except WattwaechterAuthError:
+                    system_info = await client.system_info()
+                    device_id = system_info.get_value("esp", "esp_id")
+                    fw_version = system_info.get_value("esp", "os_version") or fw_version
+                    mac = system_info.get_value("wifi", "mac_address") or ""
+                except WattwaechterAuthenticationError:
                     errors["base"] = "invalid_auth"
                 except WattwaechterConnectionError:
                     # System info failed but alive worked - might be auth issue
@@ -212,9 +212,9 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
                     # Try to fetch device name from settings
                     device_name = ""
                     try:
-                        settings = await api.async_get_settings()
-                        device_name = settings.get("device_name", "")
-                    except (WattwaechterConnectionError, WattwaechterAuthError):
+                        settings = await client.settings()
+                        device_name = settings.device_name
+                    except (WattwaechterConnectionError, WattwaechterAuthenticationError):
                         pass
 
                     title = device_name or f"WattWächter {device_id}"
@@ -247,10 +247,10 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
         """Try to fetch device_name from settings, return empty string on failure."""
         try:
             session = async_get_clientsession(self.hass)
-            api = WattwaechterApiClient(self._host, session, token)
-            settings = await api.async_get_settings()
-            return settings.get("device_name", "")
-        except (WattwaechterConnectionError, WattwaechterAuthError):
+            client = Wattwaechter(self._host, token=token, session=session)
+            settings = await client.settings()
+            return settings.device_name
+        except (WattwaechterConnectionError, WattwaechterAuthenticationError):
             return ""
 
     async def async_step_reauth(
@@ -274,10 +274,10 @@ class WattwaechterConfigFlow(ConfigFlow, domain=DOMAIN):
             token = user_input.get(CONF_TOKEN) or None
 
             session = async_get_clientsession(self.hass)
-            api = WattwaechterApiClient(self._host, session, token)
+            client = Wattwaechter(self._host, token=token, session=session)
             try:
-                await api.async_get_system_info()
-            except WattwaechterAuthError:
+                await client.system_info()
+            except WattwaechterAuthenticationError:
                 errors["base"] = "invalid_auth"
             except WattwaechterConnectionError:
                 errors["base"] = "cannot_connect"

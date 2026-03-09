@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from typing import Any
 
 from homeassistant.const import CONF_TOKEN
@@ -28,8 +29,16 @@ async def async_get_config_entry_diagnostics(
         "config": config_data,
         "options": dict(entry.options),
         "coordinator_data": {
-            "meter": coordinator.data.meter if coordinator.data else None,
-            "system": coordinator.data.system if coordinator.data else None,
+            "meter": (
+                dataclasses.asdict(coordinator.data.meter)
+                if coordinator.data and coordinator.data.meter
+                else None
+            ),
+            "system": (
+                dataclasses.asdict(coordinator.data.system)
+                if coordinator.data
+                else None
+            ),
         },
         "device_info": {
             "device_id": coordinator.device_id,

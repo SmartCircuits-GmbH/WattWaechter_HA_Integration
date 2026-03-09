@@ -48,11 +48,7 @@ async def async_setup_entry(
 
     # Dynamic OBIS sensors from meter data
     if coordinator.data.meter:
-        for obis_code, meter_value in coordinator.data.meter.items():
-            # Skip non-OBIS keys (timestamp, datetime)
-            if not isinstance(meter_value, dict) or "value" not in meter_value:
-                continue
-
+        for obis_code, obis_value in coordinator.data.meter.values.items():
             if obis_code in KNOWN_OBIS_CODES:
                 # Known OBIS code with predefined metadata
                 entities.append(
@@ -64,8 +60,8 @@ async def async_setup_entry(
                 )
             else:
                 # Unknown OBIS code - create generic sensor from API data
-                api_unit = meter_value.get("unit", "")
-                value = meter_value.get("value")
+                api_unit = obis_value.unit
+                value = obis_value.value
                 is_numeric = isinstance(value, (int, float))
 
                 if api_unit and api_unit in UNIT_MAP:
@@ -133,10 +129,10 @@ class WattwaechterObisSensor(WattwaechterEntity, SensorEntity):
         """Return the current sensor value."""
         if self.coordinator.data.meter is None:
             return None
-        meter_value = self.coordinator.data.meter.get(self._obis_code)
-        if meter_value is None or not isinstance(meter_value, dict):
+        obis = self.coordinator.data.meter.values.get(self._obis_code)
+        if obis is None:
             return None
-        return meter_value.get("value")
+        return obis.value
 
 
 class WattwaechterDiagnosticSensor(WattwaechterEntity, SensorEntity):
@@ -160,9 +156,7 @@ class WattwaechterDiagnosticSensor(WattwaechterEntity, SensorEntity):
         system = self.coordinator.data.system
         if not system:
             return None
-
-        section = system.get(self.entity_description.system_section, [])
-        for item in section:
-            if item.get("name") == self.entity_description.system_key:
-                return item.get("value")
-        return None
+        return system.get_value(
+            self.entity_description.system_section,
+            self.entity_description.system_key,
+        )
