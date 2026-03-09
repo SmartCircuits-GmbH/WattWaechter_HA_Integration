@@ -13,17 +13,20 @@ from homeassistant.components.update import (
     UpdateEntityFeature,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from aio_wattwaechter import WattwaechterAuthenticationError, WattwaechterConnectionError
 from aio_wattwaechter.models import OtaData
 
 from . import WattwaechterConfigEntry
-from .const import OTA_CHECK_INTERVAL
+from .const import DOMAIN, OTA_CHECK_INTERVAL
 from .coordinator import WattwaechterCoordinator
 from .entity import WattwaechterEntity
 
 _LOGGER = logging.getLogger(__name__)
+
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
@@ -82,14 +85,17 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
         """Install a firmware update."""
         try:
             await self.coordinator.client.ota_start()
-        except WattwaechterAuthenticationError:
-            _LOGGER.error(
-                "Cannot start firmware update: WRITE API token required"
-            )
-            raise
+        except WattwaechterAuthenticationError as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="firmware_update_auth",
+            ) from err
         except WattwaechterConnectionError as err:
-            _LOGGER.error("Cannot start firmware update: %s", err)
-            raise
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="firmware_update_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
 
         self._set_progress(5)
 

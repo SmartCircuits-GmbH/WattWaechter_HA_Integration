@@ -84,9 +84,17 @@ class WattwaechterCoordinator(DataUpdateCoordinator[WattwaechterData]):
                 meter_data = None
             system_info = await self.client.system_info()
         except WattwaechterAuthenticationError as err:
-            raise ConfigEntryAuthFailed(str(err)) from err
+            raise ConfigEntryAuthFailed(
+                translation_domain=DOMAIN,
+                translation_key="auth_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
         except WattwaechterConnectionError as err:
-            raise UpdateFailed(str(err)) from err
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="update_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
 
         # Update firmware version and mDNS name from live data
         self.fw_version = system_info.get_value("esp", "os_version") or self.fw_version

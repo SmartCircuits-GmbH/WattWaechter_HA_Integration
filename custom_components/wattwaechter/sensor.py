@@ -24,6 +24,8 @@ from .entity import WattwaechterEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+PARALLEL_UPDATES = 0
+
 # Map API unit strings to HA unit/device_class/state_class/precision for unknown OBIS codes
 UNIT_MAP: dict[str, tuple[str | None, SensorDeviceClass | None, SensorStateClass | None, int | None]] = {
     "kWh": ("kWh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING, 2),
@@ -96,11 +98,11 @@ async def async_setup_entry(
 
     # Diagnostic sensors from system info
     if coordinator.data.system:
-        for description in DIAGNOSTIC_SENSORS:
+        for diag_description in DIAGNOSTIC_SENSORS:
             entities.append(
                 WattwaechterDiagnosticSensor(
                     coordinator=coordinator,
-                    description=description,
+                    description=diag_description,
                 )
             )
 
