@@ -72,7 +72,11 @@
       "wifi_ssid": { "name": "SSID WiFi" },
       "ip_address": { "name": "Indirizzo IP" },
       "firmware_version": { "name": "Versione firmware" },
-      "uptime": { "name": "Tempo di attività" }
+      "uptime": { "name": "Tempo di attività" },
+      "mdns_name": { "name": "mDNS" }
+    },
+    "update": {
+      "firmware": { "name": "Firmware" }
     }
   }
 }

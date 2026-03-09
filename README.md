@@ -70,7 +70,7 @@ Under **Settings → Devices & Services → WattWächter Plus → Configure**:
 
 ### Diagnostics
 
-WiFi signal strength, SSID, IP address, firmware version, uptime.
+WiFi signal strength, SSID, IP address, mDNS name, firmware version, uptime.
 
 ## MQTT conflict detection
 
@@ -78,6 +78,6 @@ If your WattWächter device is already integrated via MQTT auto-discovery, this 
 
 ## Links
 
-- [WattWächter Website](https://wattwächter.de)
-- [Documentation](https://docs.wattwächter.de)
+- [WattWächter Website](https://xn--wattwchter-u5a.de)
+- [Documentation](https://docs.xn--wattwchter-u5a.de)
 - [Report an issue](https://github.com/SmartCircuits-GmbH/WattWaechter_HA_Integration/issues)

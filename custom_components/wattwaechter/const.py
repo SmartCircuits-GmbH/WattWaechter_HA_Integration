@@ -27,6 +27,7 @@ MAX_SCAN_INTERVAL = 900  # 15 minutes
 OTA_CHECK_INTERVAL = 21600  # 6 hours in seconds
 
 CONF_DEVICE_ID = "device_id"
+CONF_DEVICE_NAME = "device_name"
 CONF_MODEL = "model"
 CONF_MAC = "mac"
 CONF_FW_VERSION = "fw_version"
@@ -44,7 +45,6 @@ class ObisSensorDescription(SensorEntityDescription):
 
 
 KNOWN_OBIS_CODES: dict[str, ObisSensorDescription] = {
-    # Energy meters (kWh) - total_increasing
     # Energy meters (kWh) - total_increasing
     "1.8.0": ObisSensorDescription(
         key="1.8.0",
@@ -266,6 +266,13 @@ DIAGNOSTIC_SENSORS: tuple[DiagnosticSensorDescription, ...] = (
         translation_key="uptime",
         system_section="uptime",
         system_key="uptime",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    DiagnosticSensorDescription(
+        key="mdns_name",
+        translation_key="mdns_name",
+        system_section="wifi",
+        system_key="mdns_name",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
 )

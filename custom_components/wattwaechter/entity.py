@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DEVICE_NAME, DOMAIN, MANUFACTURER
+from .const import DOMAIN, MANUFACTURER
 from .coordinator import WattwaechterCoordinator
 
 
@@ -21,13 +21,14 @@ class WattwaechterEntity(CoordinatorEntity[WattwaechterCoordinator]):
     @property
     def device_info(self) -> DeviceInfo:
         """Return device information."""
+        config_host = self.coordinator.mdns_name or self.coordinator.host
         info = DeviceInfo(
             identifiers={(DOMAIN, self.coordinator.device_id)},
-            name=DEVICE_NAME,
+            name=self.coordinator.device_name,
             manufacturer=MANUFACTURER,
             model=self.coordinator.model,
             sw_version=self.coordinator.fw_version,
-            configuration_url=f"http://{self.coordinator.host}",
+            configuration_url=f"http://{config_host}",
         )
         if self.coordinator.mac:
             info["connections"] = {

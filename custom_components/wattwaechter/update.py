@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
 import logging
+import time
 from typing import Any
 
 from homeassistant.components.update import (
@@ -12,12 +12,12 @@ from homeassistant.components.update import (
     UpdateEntity,
     UpdateEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import WattwaechterApiClient, WattwaechterAuthError, WattwaechterConnectionError
-from .const import DOMAIN, OTA_CHECK_INTERVAL
+from . import WattwaechterConfigEntry
+from .api import WattwaechterAuthError, WattwaechterConnectionError
+from .const import OTA_CHECK_INTERVAL
 from .coordinator import WattwaechterCoordinator
 from .entity import WattwaechterEntity
 
@@ -26,11 +26,11 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: WattwaechterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up WattWächter firmware update entity."""
-    coordinator: WattwaechterCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     async_add_entities([WattwaechterUpdateEntity(coordinator)])
 
 
@@ -40,7 +40,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
     _attr_device_class = UpdateDeviceClass.FIRMWARE
     _attr_supported_features = UpdateEntityFeature.INSTALL | UpdateEntityFeature.PROGRESS
     _attr_should_poll = True
-    _attr_unique_id_suffix = "firmware_update"
+    _attr_translation_key = "firmware"
 
     def __init__(self, coordinator: WattwaechterCoordinator) -> None:
         """Initialize the update entity."""
@@ -49,10 +49,10 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
         self._ota_data: dict[str, Any] | None = None
         self._last_check: float = 0
 
-    @property
-    def name(self) -> str:
-        """Return entity name."""
-        return "Firmware"
+    async def async_added_to_hass(self) -> None:
+        """Fetch OTA data when entity is added."""
+        await super().async_added_to_hass()
+        await self.async_update()
 
     @property
     def installed_version(self) -> str | None:
@@ -149,10 +149,8 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
 
     async def async_update(self) -> None:
         """Check for firmware updates periodically."""
-        import time
-
         now = time.monotonic()
-        if now - self._last_check < OTA_CHECK_INTERVAL:
+        if self._last_check > 0 and now - self._last_check < OTA_CHECK_INTERVAL:
             return
 
         self._last_check = now
