@@ -31,9 +31,6 @@
       "firmware_version": {
         "default": "mdi:chip"
       },
-      "uptime": {
-        "default": "mdi:clock-outline"
-      },
       "mdns_name": {
         "default": "mdi:dns"
       }

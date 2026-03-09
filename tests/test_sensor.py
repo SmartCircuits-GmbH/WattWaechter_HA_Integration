@@ -104,11 +104,6 @@ async def test_diagnostic_sensors(
     assert state is not None
     assert state.state == "1.2.3"
 
-    # Uptime
-    state = hass.states.get("sensor.haushalt_test_uptime")
-    assert state is not None
-    assert state.state == "2d 5h 30m"
-
     # mDNS
     state = hass.states.get("sensor.haushalt_test_mdns")
     assert state is not None
