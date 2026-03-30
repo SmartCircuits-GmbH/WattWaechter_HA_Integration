@@ -72,7 +72,6 @@
       "wifi_ssid": { "name": "WiFi-SSID" },
       "ip_address": { "name": "IP-adres" },
       "firmware_version": { "name": "Firmwareversie" },
-      "uptime": { "name": "Bedrijfstijd" },
       "mdns_name": { "name": "mDNS" }
     },
     "update": {

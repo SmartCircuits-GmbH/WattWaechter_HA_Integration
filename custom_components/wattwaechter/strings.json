@@ -16,6 +16,14 @@
           "token": "API Token (optional)"
         }
       },
+      "reconfigure": {
+        "title": "Reconfigure WattWächter Plus",
+        "description": "Update the connection settings for your WattWächter device.",
+        "data": {
+          "host": "Host",
+          "token": "API Token (optional)"
+        }
+      },
       "reauth_confirm": {
         "title": "Re-authenticate WattWächter Plus",
         "description": "The API token for WattWächter {device_id} ({host}) is invalid or expired. Please enter a new token.",
@@ -32,7 +40,8 @@
     "abort": {
       "already_configured": "This device is already configured. The IP address has been updated.",
       "already_configured_mqtt": "This device is already integrated via MQTT auto-discovery. Please disable MQTT on the device or remove the MQTT entities first to use this integration instead.",
-      "no_device_id": "Could not identify the device."
+      "no_device_id": "Could not identify the device.",
+      "reconfigure_successful": "Configuration updated successfully."
     }
   },
   "options": {
@@ -43,6 +52,23 @@
           "scan_interval": "Update interval (seconds)"
         }
       }
+    }
+  },
+  "exceptions": {
+    "cannot_connect": {
+      "message": "Cannot connect to {host}"
+    },
+    "auth_failed": {
+      "message": "Authentication failed: {error}"
+    },
+    "update_failed": {
+      "message": "Failed to fetch data: {error}"
+    },
+    "firmware_update_auth": {
+      "message": "Cannot start firmware update: WRITE API token required."
+    },
+    "firmware_update_failed": {
+      "message": "Cannot start firmware update: {error}"
     }
   },
   "entity": {
@@ -72,7 +98,6 @@
       "wifi_ssid": { "name": "WiFi SSID" },
       "ip_address": { "name": "IP address" },
       "firmware_version": { "name": "Firmware version" },
-      "uptime": { "name": "Uptime" },
       "mdns_name": { "name": "mDNS" }
     },
     "update": {

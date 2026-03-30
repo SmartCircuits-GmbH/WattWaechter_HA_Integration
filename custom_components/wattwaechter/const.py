@@ -21,9 +21,10 @@ from homeassistant.const import (
 
 DOMAIN = "wattwaechter"
 
-DEFAULT_SCAN_INTERVAL = 30
-MIN_SCAN_INTERVAL = 5
+DEFAULT_SCAN_INTERVAL = 120
+MIN_SCAN_INTERVAL = 3
 MAX_SCAN_INTERVAL = 900  # 15 minutes
+SYSTEM_INFO_INTERVAL = 60  # seconds between system_info polls
 OTA_CHECK_INTERVAL = 21600  # 6 hours in seconds
 
 CONF_DEVICE_ID = "device_id"
@@ -259,13 +260,6 @@ DIAGNOSTIC_SENSORS: tuple[DiagnosticSensorDescription, ...] = (
         translation_key="firmware_version",
         system_section="esp",
         system_key="os_version",
-        entity_category=EntityCategory.DIAGNOSTIC,
-    ),
-    DiagnosticSensorDescription(
-        key="uptime",
-        translation_key="uptime",
-        system_section="uptime",
-        system_key="uptime",
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     DiagnosticSensorDescription(

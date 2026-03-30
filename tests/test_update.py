@@ -10,6 +10,7 @@ from aio_wattwaechter import WattwaechterAuthenticationError, WattwaechterConnec
 from aio_wattwaechter.models import AliveResponse
 
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 
 from .conftest import (
     MOCK_ALIVE_RESPONSE,
@@ -105,7 +106,7 @@ async def test_update_entity_install_auth_error(
         side_effect=WattwaechterAuthenticationError("WRITE token required")
     )
 
-    with pytest.raises(WattwaechterAuthenticationError):
+    with pytest.raises(HomeAssistantError):
         await hass.services.async_call(
             "update",
             "install",
@@ -126,7 +127,7 @@ async def test_update_entity_install_connection_error(
         side_effect=WattwaechterConnectionError("Connection refused")
     )
 
-    with pytest.raises(WattwaechterConnectionError):
+    with pytest.raises(HomeAssistantError):
         await hass.services.async_call(
             "update",
             "install",
