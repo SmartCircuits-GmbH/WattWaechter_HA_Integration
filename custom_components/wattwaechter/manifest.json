@@ -9,7 +9,7 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/SmartCircuits-GmbH/WattWaechter_HA_Integration/issues",
   "requirements": ["aio-wattwaechter==1.0.0"],
-  "version": "0.1.1",
+  "version": "0.2.0",
   "zeroconf": [
     {
       "type": "_wattwaechter._tcp.local."
