@@ -16,6 +16,6 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install pytest pytest-asyncio pytest-homeassistant-custom-component zeroconf
+        run: pip install pytest pytest-asyncio pytest-homeassistant-custom-component zeroconf aio-wattwaechter
       - name: Run tests
         run: pytest tests/ -v

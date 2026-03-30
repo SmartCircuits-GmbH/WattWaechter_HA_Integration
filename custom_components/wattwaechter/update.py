@@ -13,15 +13,20 @@ from homeassistant.components.update import (
     UpdateEntityFeature,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from aio_wattwaechter import WattwaechterAuthenticationError, WattwaechterConnectionError
+from aio_wattwaechter.models import OtaData
+
 from . import WattwaechterConfigEntry
-from .api import WattwaechterAuthError, WattwaechterConnectionError
-from .const import OTA_CHECK_INTERVAL
+from .const import DOMAIN, OTA_CHECK_INTERVAL
 from .coordinator import WattwaechterCoordinator
 from .entity import WattwaechterEntity
 
 _LOGGER = logging.getLogger(__name__)
+
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
@@ -46,7 +51,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
         """Initialize the update entity."""
         super().__init__(coordinator)
         self._attr_unique_id = f"{coordinator.device_id}_firmware_update"
-        self._ota_data: dict[str, Any] | None = None
+        self._ota_data: OtaData | None = None
         self._last_check: float = 0
 
     async def async_added_to_hass(self) -> None:
@@ -62,35 +67,35 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
     @property
     def latest_version(self) -> str | None:
         """Return the latest available firmware version."""
-        if self._ota_data and self._ota_data.get("update_available"):
-            return self._ota_data.get("version")
+        if self._ota_data and self._ota_data.update_available:
+            return self._ota_data.version
         return self.installed_version
 
     @property
     def release_summary(self) -> str | None:
         """Return release notes."""
-        if not self._ota_data or not self._ota_data.get("update_available"):
+        if not self._ota_data or not self._ota_data.update_available:
             return None
         # Try German first, fall back to English
-        return (
-            self._ota_data.get("release_note_de")
-            or self._ota_data.get("release_note_en")
-        )
+        return self._ota_data.release_note_de or self._ota_data.release_note_en
 
     async def async_install(
         self, version: str | None, backup: bool, **kwargs: Any
     ) -> None:
         """Install a firmware update."""
         try:
-            await self.coordinator.api.async_start_ota()
-        except WattwaechterAuthError:
-            _LOGGER.error(
-                "Cannot start firmware update: WRITE API token required"
-            )
-            raise
+            await self.coordinator.client.ota_start()
+        except WattwaechterAuthenticationError as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="firmware_update_auth",
+            ) from err
         except WattwaechterConnectionError as err:
-            _LOGGER.error("Cannot start firmware update: %s", err)
-            raise
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="firmware_update_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
 
         self._set_progress(5)
 
@@ -104,7 +109,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
                     "WattWächter device did not come back online after firmware update"
                 )
         finally:
-            self._attr_in_progress = False
+            self._attr_in_progress = None
             self.async_write_ha_state()
 
     def _set_progress(self, percent: int) -> None:
@@ -121,12 +126,12 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
         await asyncio.sleep(5)
         for i in range(24):  # poll every 5s, up to ~2 minutes
             try:
-                result = await self.coordinator.api.async_alive()
+                result = await self.coordinator.client.alive()
                 if device_went_offline:
                     _LOGGER.debug("Device back online after reboot")
                     self._set_progress(90)
                     return True
-                new_version = result.get("version", "")
+                new_version = result.version
                 if new_version and new_version != old_version:
                     _LOGGER.debug("Firmware version changed: %s -> %s", old_version, new_version)
                     self._set_progress(90)
@@ -141,7 +146,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
 
         # Phase 2: If still not detected, final alive check
         try:
-            await self.coordinator.api.async_alive()
+            await self.coordinator.client.alive()
             self._set_progress(90)
             return True
         except WattwaechterConnectionError:
@@ -155,7 +160,7 @@ class WattwaechterUpdateEntity(WattwaechterEntity, UpdateEntity):
 
         self._last_check = now
         try:
-            result = await self.coordinator.api.async_check_ota()
-            self._ota_data = result.get("data", {})
-        except (WattwaechterConnectionError, WattwaechterAuthError) as err:
+            result = await self.coordinator.client.ota_check()
+            self._ota_data = result.data
+        except (WattwaechterConnectionError, WattwaechterAuthenticationError) as err:
             _LOGGER.debug("OTA check failed: %s", err)

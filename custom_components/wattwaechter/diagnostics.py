@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import dataclasses
 from typing import Any
 
+from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.const import CONF_TOKEN
 from homeassistant.core import HomeAssistant
 
 from . import WattwaechterConfigEntry
 
-REDACT_KEYS = {CONF_TOKEN}
+TO_REDACT = {CONF_TOKEN}
+TO_REDACT_DEVICE = {"mac"}
 
 
 async def async_get_config_entry_diagnostics(
@@ -18,24 +21,29 @@ async def async_get_config_entry_diagnostics(
     """Return diagnostics for a config entry."""
     coordinator = entry.runtime_data
 
-    # Redact sensitive data from config
-    config_data = dict(entry.data)
-    for key in REDACT_KEYS:
-        if key in config_data and config_data[key]:
-            config_data[key] = "**REDACTED**"
-
     return {
-        "config": config_data,
+        "config": async_redact_data(dict(entry.data), TO_REDACT),
         "options": dict(entry.options),
         "coordinator_data": {
-            "meter": coordinator.data.meter if coordinator.data else None,
-            "system": coordinator.data.system if coordinator.data else None,
+            "meter": (
+                dataclasses.asdict(coordinator.data.meter)
+                if coordinator.data and coordinator.data.meter
+                else None
+            ),
+            "system": (
+                dataclasses.asdict(coordinator.data.system)
+                if coordinator.data
+                else None
+            ),
         },
-        "device_info": {
-            "device_id": coordinator.device_id,
-            "model": coordinator.model,
-            "fw_version": coordinator.fw_version,
-            "mac": coordinator.mac,
-            "host": coordinator.host,
-        },
+        "device_info": async_redact_data(
+            {
+                "device_id": coordinator.device_id,
+                "model": coordinator.model,
+                "fw_version": coordinator.fw_version,
+                "mac": coordinator.mac,
+                "host": coordinator.host,
+            },
+            TO_REDACT_DEVICE,
+        ),
     }

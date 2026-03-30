@@ -11,8 +11,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import WattwaechterApiClient, WattwaechterConnectionError
-from .const import DEFAULT_SCAN_INTERVAL
+from aio_wattwaechter import Wattwaechter, WattwaechterConnectionError
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 from .coordinator import WattwaechterCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,15 +30,19 @@ async def async_setup_entry(
     token = entry.data.get(CONF_TOKEN)
 
     session = async_get_clientsession(hass)
-    api = WattwaechterApiClient(host, session, token)
+    client = Wattwaechter(host, token=token, session=session)
 
     # Verify device is reachable
     try:
-        await api.async_alive()
+        await client.alive()
     except WattwaechterConnectionError as err:
-        raise ConfigEntryNotReady(f"Cannot connect to {host}") from err
+        raise ConfigEntryNotReady(
+            translation_domain=DOMAIN,
+            translation_key="cannot_connect",
+            translation_placeholders={"host": host},
+        ) from err
 
-    coordinator = WattwaechterCoordinator(hass, entry, api)
+    coordinator = WattwaechterCoordinator(hass, entry, client)
     await coordinator.async_config_entry_first_refresh()
 
     entry.runtime_data = coordinator

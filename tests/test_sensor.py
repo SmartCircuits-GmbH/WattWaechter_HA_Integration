@@ -16,6 +16,7 @@ from .conftest import (
     MOCK_METER_DATA,
     MOCK_METER_DATA_MINIMAL,
     MOCK_METER_DATA_WITH_UNKNOWN,
+    MOCK_OTA_CHECK_NO_UPDATE,
     MOCK_SYSTEM_INFO,
 )
 
@@ -23,15 +24,13 @@ from .conftest import (
 async def _setup_integration(hass: HomeAssistant, mock_config_entry, meter_data):
     """Set up the integration with given meter data."""
     with patch(
-        "custom_components.wattwaechter.WattwaechterApiClient"
+        "custom_components.wattwaechter.Wattwaechter"
     ) as mock_cls:
         client = mock_cls.return_value
-        client.async_alive = AsyncMock(return_value=MOCK_ALIVE_RESPONSE)
-        client.async_get_meter_data = AsyncMock(return_value=meter_data)
-        client.async_get_system_info = AsyncMock(return_value=MOCK_SYSTEM_INFO)
-        client.async_check_ota = AsyncMock(
-            return_value={"ok": True, "data": {"update_available": False}}
-        )
+        client.alive = AsyncMock(return_value=MOCK_ALIVE_RESPONSE)
+        client.meter_data = AsyncMock(return_value=meter_data)
+        client.system_info = AsyncMock(return_value=MOCK_SYSTEM_INFO)
+        client.ota_check = AsyncMock(return_value=MOCK_OTA_CHECK_NO_UPDATE)
         client.host = "192.168.1.100"
 
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -84,7 +83,7 @@ async def test_diagnostic_sensors(
     """Test that diagnostic sensors are created from system info."""
     await _setup_integration(hass, mock_config_entry, MOCK_METER_DATA)
 
-    # WiFi signal
+    # WiFi signal (InfoEntry.value is str, HA converts for numeric device_class)
     state = hass.states.get("sensor.haushalt_test_wifi_signal")
     assert state is not None
     assert float(state.state) == -45
@@ -104,11 +103,6 @@ async def test_diagnostic_sensors(
     state = hass.states.get("sensor.haushalt_test_firmware_version")
     assert state is not None
     assert state.state == "1.2.3"
-
-    # Uptime
-    state = hass.states.get("sensor.haushalt_test_uptime")
-    assert state is not None
-    assert state.state == "2d 5h 30m"
 
     # mDNS
     state = hass.states.get("sensor.haushalt_test_mdns")
