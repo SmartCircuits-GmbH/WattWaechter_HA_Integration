@@ -1,5 +1,25 @@
 # WattWächter Plus – Home Assistant Integration
 
+> [!IMPORTANT]
+> **This custom integration is deprecated and no longer maintained.**
+> WattWächter has been part of Home Assistant itself since **2026.7**:
+> [official WattWächter integration](https://www.home-assistant.io/integrations/wattwaechter).
+> It supports the WattWächter Plus and WattWächter Gas/Wasser and receives all new features and fixes.
+>
+> This custom integration uses the same domain (`wattwaechter`) as the official one. As long as it is
+> installed, Home Assistant loads it **instead of** the official integration, so you stay on this old version.
+>
+> **How to switch**
+>
+> 1. In HACS, open the WattWächter integration and choose **⋮ → Remove**.
+> 2. Restart Home Assistant.
+> 3. Your existing WattWächter devices are taken over by the official integration. Entity IDs and energy
+>    statistics of the meter sensors stay the same. A few entities that only this custom integration
+>    provided (for example the old firmware update entity) are shown as *no longer provided* afterwards
+>    and can be deleted.
+> 4. If a device does not come back, delete it under **Settings → Devices & services → WattWächter**
+>    and add it again; it is discovered automatically.
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/SmartCircuits-GmbH/WattWaechter_HA_Integration)](https://github.com/SmartCircuits-GmbH/WattWaechter_HA_Integration/releases)
 
